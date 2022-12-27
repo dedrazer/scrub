@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"scrub/internal/model"
+	"scrub/internal/model/deck"
 
 	"go.uber.org/zap"
 )
@@ -14,7 +14,7 @@ func main() {
 	}
 
 	logger.Info("initialising deck")
-	testDeck := model.NewDeck()
+	testDeck := deck.NewDeck()
 
 	logger.Info("getting random card")
 	card, err := testDeck.GetRandomCard()
