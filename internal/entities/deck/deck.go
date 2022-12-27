@@ -78,8 +78,3 @@ func (d *Deck) Print() string {
 func (d *Deck) Log(logger *zap.Logger) {
 	logger.Info("deck info", zap.String("deck", d.Print()))
 }
-
-func (d *Deck) RestoreBurnt() {
-	d.ActiveCards = append(d.ActiveCards, d.BurntCards...)
-	d.BurntCards = []Card{}
-}
