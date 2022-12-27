@@ -19,6 +19,10 @@ func (d *Deck) TakeCardByIndex(index int) (*Card, error) {
 }
 
 func (d *Deck) TakeRandomCard() (*Card, error) {
+	if len(d.ActiveCards) == 0 {
+		return nil, errors.ErrActiveCardsIsEmpty
+	}
+
 	rand.Seed(time.Now().UnixNano())
 
 	index := rand.Intn(len(d.ActiveCards))
