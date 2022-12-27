@@ -1,7 +1,7 @@
 package model
 
 import (
-	"blackjack-simulator/internal/errors"
+	"scrub/internal/errors"
 )
 
 func (d *Deck) TakeCardByIndex(index int) (*Card, error) {

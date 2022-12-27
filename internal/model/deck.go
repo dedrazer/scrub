@@ -7,14 +7,44 @@ import (
 )
 
 const (
+	deckSize        = 52
 	descriptionCard = "%s of %s"
 	descriptionDeck = "Deck with %d remaining cards and %d burnt cards"
+)
+
+var (
+	cardSymbols = []string{"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"}
+	cardValues  = map[string]uint{
+		"1":  1,
+		"2":  2,
+		"3":  3,
+		"4":  4,
+		"5":  5,
+		"6":  6,
+		"7":  7,
+		"8":  8,
+		"9":  9,
+		"10": 10,
+		"J":  10,
+		"Q":  10,
+		"K":  10,
+		"A":  11,
+	}
+	suits = []string{"Clubs", "Diamonds", "Hearts", "Spades"}
 )
 
 type Card struct {
 	Value  uint
 	Symbol string
 	Suit   string
+}
+
+func NewCard(symbol, suit string) Card {
+	return Card{
+		Value:  cardValues[symbol],
+		Symbol: symbol,
+		Suit:   suit,
+	}
 }
 
 func (c *Card) Print() string {
@@ -28,6 +58,17 @@ func (c *Card) Log(logger *zap.Logger) {
 type Deck struct {
 	ActiveCards []Card
 	BurntCards  []Card
+}
+
+func NewDeck() Deck {
+	res := make([]Card, deckSize)
+	for i, suit := range suits {
+		for j, symbol := range cardSymbols {
+			res[i*len(cardSymbols)+j] = NewCard(symbol, suit)
+		}
+	}
+
+	return Deck{ActiveCards: res, BurntCards: []Card{}}
 }
 
 func (d *Deck) Print() string {

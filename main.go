@@ -1,8 +1,8 @@
 package main
 
 import (
-	"blackjack-simulator/internal/service"
 	"fmt"
+	"scrub/internal/model"
 
 	"go.uber.org/zap"
 )
@@ -14,7 +14,7 @@ func main() {
 	}
 
 	logger.Info("initialising deck")
-	testDeck := service.NewDeck()
+	testDeck := model.NewDeck()
 
 	logger.Info("getting random card")
 	card, err := testDeck.GetRandomCard()

@@ -1,8 +1,8 @@
 package model
 
 import (
-	"blackjack-simulator/internal/errors"
 	"math/rand"
+	"scrub/internal/errors"
 	"time"
 )
 
