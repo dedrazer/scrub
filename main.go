@@ -31,4 +31,18 @@ func main() {
 
 	card.Log(logger)
 	testDeck.Log(logger)
+
+	logger.Info("taking random card")
+	card, err = testDeck.TakeRandomCard()
+
+	card.Log(logger)
+	testDeck.Log(logger)
+
+	logger.Info("taking 10 random cards")
+	for i := 0; i < 10; i++ {
+		card, err = testDeck.TakeRandomCard()
+		card.Log(logger)
+	}
+
+	testDeck.Log(logger)
 }

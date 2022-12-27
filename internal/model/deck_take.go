@@ -1,7 +1,9 @@
 package model
 
 import (
+	"math/rand"
 	"scrub/internal/errors"
+	"time"
 )
 
 func (d *Deck) TakeCardByIndex(index int) (*Card, error) {
@@ -14,4 +16,12 @@ func (d *Deck) TakeCardByIndex(index int) (*Card, error) {
 	d.BurntCards = append(d.BurntCards, res)
 
 	return &d.BurntCards[len(d.BurntCards)-1], nil
+}
+
+func (d *Deck) TakeRandomCard() (*Card, error) {
+	rand.Seed(time.Now().UnixNano())
+
+	index := rand.Intn(len(d.ActiveCards))
+
+	return d.TakeCardByIndex(index)
 }
