@@ -24,7 +24,7 @@ var (
 		"K":  10,
 		"A":  11,
 	}
-	suits = []string{"clubs", "diamonds", "hearts", "spades"}
+	suits = []string{"Clubs", "Diamonds", "Hearts", "Spades"}
 )
 
 func NewDeck() model.Deck {

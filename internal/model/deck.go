@@ -1,9 +1,14 @@
 package model
 
 import (
-	"blackjack-simulator/internal/errors"
-	"math/rand"
-	"time"
+	"fmt"
+
+	"go.uber.org/zap"
+)
+
+const (
+	descriptionCard = "%s of %s"
+	descriptionDeck = "Deck with %d remaining cards and %d burnt cards"
 )
 
 type Card struct {
@@ -12,22 +17,23 @@ type Card struct {
 	Suit   string
 }
 
+func (c *Card) Print() string {
+	return fmt.Sprintf(descriptionCard, c.Symbol, c.Suit)
+}
+
+func (c *Card) Log(logger *zap.Logger) {
+	logger.Info("got card", zap.String("card", c.Print()))
+}
+
 type Deck struct {
 	ActiveCards []Card
 	BurntCards  []Card
 }
 
-func (d *Deck) GetCardByIndex(index int) (*Card, error) {
-	if index >= len(d.ActiveCards) {
-		return nil, errors.ErrIndexOutOfRange
-	}
-
-	return &d.ActiveCards[index], nil
+func (d *Deck) Print() string {
+	return fmt.Sprintf(descriptionDeck, len(d.ActiveCards), len(d.BurntCards))
 }
 
-func (d *Deck) GetRandomCard() (*Card, error) {
-	rand.Seed(time.Now().UnixNano())
-	index := rand.Intn(len(d.ActiveCards))
-
-	return d.GetCardByIndex(index)
+func (d *Deck) Log(logger *zap.Logger) {
+	logger.Info("deck info", zap.String("deck", d.Print()))
 }
