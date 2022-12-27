@@ -7,7 +7,7 @@ import (
 
 func main() {
 	testDeck := service.NewDeck()
-	card, err := testDeck.GetCard()
+	card, err := testDeck.GetRandomCard()
 	if err != nil {
 		fmt.Printf("failed to get card with err: %w", err)
 		return

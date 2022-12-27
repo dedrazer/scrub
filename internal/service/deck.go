@@ -35,7 +35,7 @@ func NewDeck() model.Deck {
 		}
 	}
 
-	return model.Deck{ActiveCards: res}
+	return model.Deck{ActiveCards: res, BurntCards: []model.Card{}}
 }
 
 func NewCard(symbol, suit string) model.Card {
