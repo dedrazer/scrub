@@ -45,4 +45,15 @@ func main() {
 	}
 
 	testDeck.Log(logger)
+
+	logger.Info("getting first card")
+	card, _ = testDeck.GetCardByIndex(0)
+	card.Log(logger)
+
+	logger.Info("shuffling cards")
+	testDeck.Shuffle()
+
+	logger.Info("getting first card")
+	card, _ = testDeck.GetCardByIndex(0)
+	card.Log(logger)
 }
