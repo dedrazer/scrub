@@ -71,6 +71,10 @@ func NewDeck() Deck {
 	return Deck{ActiveCards: res, BurntCards: []Card{}}
 }
 
+func NewDeckByCards(cards []Card) Deck {
+	return Deck{ActiveCards: cards, BurntCards: []Card{}}
+}
+
 func (d *Deck) Print() string {
 	return fmt.Sprintf(descriptionDeck, len(d.ActiveCards), len(d.BurntCards))
 }

@@ -13,7 +13,7 @@ func NewBlackjack(numberOfDecks uint) *Blackjack {
 	for i := uint(0); i < numberOfDecks; i++ {
 		d := deck.NewDeck()
 
-		finalDeck.Merge(&d)
+		finalDeck = deck.Merge(&finalDeck, &d)
 	}
 
 	return &Blackjack{
