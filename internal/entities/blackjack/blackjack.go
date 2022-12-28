@@ -16,6 +16,8 @@ func NewBlackjack(numberOfDecks uint) *Blackjack {
 		finalDeck = deck.Merge(&finalDeck, &d)
 	}
 
+	finalDeck.Shuffle()
+
 	return &Blackjack{
 		deck:          &finalDeck,
 		numberOfDecks: numberOfDecks,
