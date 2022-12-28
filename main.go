@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"scrub/internal/model/deck"
+	"scrub/internal/entities/deck"
 
 	"go.uber.org/zap"
 )
