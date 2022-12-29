@@ -22,7 +22,7 @@ func (bj *Blackjack) DealRound(logger *zap.Logger, numberOfHands uint8) (playerC
 	dealerCards = make([]deck.Card, 2)
 
 	// Deal down card to dealer
-	dealerCardDown, err := bj.DealCard(logger)
+	dealerCardDown, err := bj.DealCard()
 	if err != nil {
 		return nil, nil, errors.ErrFailedSubMethod("DealCard (dealer down)", err)
 	}
@@ -36,7 +36,7 @@ func (bj *Blackjack) DealRound(logger *zap.Logger, numberOfHands uint8) (playerC
 	}
 
 	// Deal up card to dealer
-	dealerCardUp, err := bj.DealCard(logger)
+	dealerCardUp, err := bj.DealCard()
 	if err != nil {
 		return nil, nil, errors.ErrFailedSubMethod("DealCard (dealer up)", err)
 	}
@@ -48,7 +48,7 @@ func (bj *Blackjack) DealRound(logger *zap.Logger, numberOfHands uint8) (playerC
 
 func (bj *Blackjack) DealRoundOfCards(logger *zap.Logger, playerCards map[uint8][]deck.Card) error {
 	for k := range playerCards {
-		card, err := bj.DealCard(logger)
+		card, err := bj.DealCard()
 		if err != nil {
 			return err
 		}
