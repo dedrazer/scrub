@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	logger, err := zap.NewProduction()
+	config := zap.NewProductionConfig()
+	config.DisableCaller = true
+	
+	logger, err := config.Build()
 	if err != nil {
 		panic(fmt.Sprintf("failed to init zap: %w ", err))
 	}
