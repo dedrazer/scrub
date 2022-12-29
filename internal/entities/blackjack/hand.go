@@ -1,6 +1,7 @@
 package blackjack
 
 import (
+	"fmt"
 	"scrub/internal/entities/deck"
 	"strings"
 
@@ -26,11 +27,26 @@ func (h *Hand) Log(logger *zap.Logger) {
 		return
 	}
 
-	logger.Info("hand", zap.String("cards", h.Print()))
+	logger.Info("hand", zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
 }
 
 func (h *Hand) DealerLog(logger *zap.Logger) {
 	logger.Info("dealer hand", zap.String("card", h.cards[1].Print()))
+}
+
+func (h *Hand) PrintValue() string {
+	values := h.Value()
+
+	stringValues := make([]string, len(values))
+	for i, v := range values {
+		stringValues[i] = fmt.Sprintf("%d", v)
+	}
+
+	return strings.Join(stringValues, "/")
+}
+
+func (h *Hand) LogValue(logger *zap.Logger) {
+	logger.Info("hand value", zap.String("amount", h.PrintValue()))
 }
 
 func (h *Hand) Value() []uint {
@@ -50,6 +66,15 @@ func (h *Hand) Value() []uint {
 	}
 
 	return []uint{total}
+}
+
+func (h *Hand) UpperValue() uint {
+	values := h.Value()
+	return values[len(values)-1]
+}
+
+func (h *Hand) Bust() bool {
+	return h.UpperValue() > 21
 }
 
 func (h *Hand) AddCard(c deck.Card) {

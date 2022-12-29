@@ -1,6 +1,8 @@
 package blackjack
 
-import "scrub/internal/entities/deck"
+import (
+	"scrub/internal/entities/deck"
+)
 
 type Blackjack struct {
 	deck          *deck.Deck

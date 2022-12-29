@@ -14,10 +14,14 @@ func Demo(logger *zap.Logger) {
 		logger.Fatal("failed to deal round", zap.Error(err))
 	}
 
+	dealerHand.DealerLog(logger)
+
 	for i, ph := range playerHands {
 		logger.Info("player hand", zap.Int("player", i+1))
 		ph.Log(logger)
 	}
-
-	dealerHand.DealerLog(logger)
+	err = testBlackjack.Play(logger, playerHands, dealerHand)
+	if err != nil {
+		logger.Fatal("unexpected error", zap.Error(err))
+	}
 }
