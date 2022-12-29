@@ -11,28 +11,57 @@ import (
 func TestDeck_TakeCardByIndex(t *testing.T) {
 	type testCase struct {
 		name          string
-		index         int
-		expectedCard  string
+		indexes       []int
+		expectedCards []*Card
 		expectedError error
 	}
 
 	testCases := []testCase{
 		{
-			name:          "OK First Card",
-			index:         0,
-			expectedCard:  "Ace of Clubs",
+			name:    "OK First Card",
+			indexes: []int{0},
+			expectedCards: []*Card{
+				{
+					Symbol: "Ace",
+					Value:  11,
+					Suit:   "Clubs",
+				},
+			},
 			expectedError: nil,
 		},
 		{
-			name:          "OK Last Card",
-			index:         51,
-			expectedCard:  "King of Spades",
+			name:    "OK Last Card",
+			indexes: []int{51},
+			expectedCards: []*Card{
+				{
+					Symbol: "King",
+					Value:  10,
+					Suit:   "Spades",
+				},
+			},
 			expectedError: nil,
 		},
 		{
 			name:          "Err Index Out Of Range",
-			index:         52,
+			indexes:       []int{52},
 			expectedError: errors.ErrIndexOutOfRange,
+		},
+		{
+			name:    "OK Multiple Cards",
+			indexes: []int{0, 0},
+			expectedCards: []*Card{
+				{
+					Symbol: "Ace",
+					Value:  11,
+					Suit:   "Clubs",
+				},
+				{
+					Symbol: "2",
+					Value:  2,
+					Suit:   "Clubs",
+				},
+			},
+			expectedError: nil,
 		},
 	}
 
@@ -40,7 +69,14 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testDeck := NewDeck()
 
-			card, err := testDeck.TakeCardByIndex(tc.index)
+			var err error
+			cards := make([]*Card, len(tc.indexes))
+			for i, index := range tc.indexes {
+				cards[i], err = testDeck.TakeCardByIndex(index)
+				if err != nil {
+					break
+				}
+			}
 
 			if tc.expectedError != nil {
 				require.Error(t, err)
@@ -49,9 +85,9 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			}
 
 			require.NoError(t, err, "must not return error")
-			assert.Equal(t, card.Print(), tc.expectedCard, "selected card")
-			assert.Len(t, testDeck.ActiveCards, 51, "51 cards should remain")
-			assert.Len(t, testDeck.BurntCards, 1, "1 card should be burnt")
+			assert.EqualValues(t, cards, tc.expectedCards, "selected cards")
+			assert.Len(t, testDeck.ActiveCards, 52-len(tc.indexes), "%d cards should remain", 52-len(tc.indexes))
+			assert.Len(t, testDeck.BurntCards, len(tc.indexes), "%d card should be burnt", len(tc.indexes))
 		})
 	}
 }

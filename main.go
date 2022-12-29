@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"scrub/internal/entities/deck"
+	"scrub/internal/entities/blackjack"
 
 	"go.uber.org/zap"
 )
@@ -13,5 +13,6 @@ func main() {
 		panic(fmt.Sprintf("failed to init zap: %w ", err))
 	}
 
-	deck.Demo(logger)
+	//deck.Demo(logger)
+	blackjack.Demo(logger)
 }
