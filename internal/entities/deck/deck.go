@@ -15,7 +15,7 @@ const (
 var (
 	cardSymbols = []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
 	cardValues  = map[string]uint{
-		"1":     1,
+		"Ace":   1,
 		"2":     2,
 		"3":     3,
 		"4":     4,
@@ -28,7 +28,6 @@ var (
 		"Jack":  10,
 		"Queen": 10,
 		"King":  10,
-		"Ace":   11,
 	}
 	suits = []string{"Clubs", "Diamonds", "Hearts", "Spades"}
 )
