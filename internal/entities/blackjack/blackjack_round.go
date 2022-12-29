@@ -8,7 +8,10 @@ import (
 )
 
 func (bj *Blackjack) DealRound(logger *zap.Logger, numberOfHands uint8) (playerCards map[uint8][]deck.Card, dealerCards []deck.Card, err error) {
-	playerCards = make(map[uint8][]deck.Card)
+	playerCards = make(map[uint8][]deck.Card, numberOfHands)
+	for i := uint8(0); i < numberOfHands; i++ {
+		playerCards[i] = nil
+	}
 
 	// Deal first card to each player
 	err = bj.DealRoundOfCards(logger, playerCards)
