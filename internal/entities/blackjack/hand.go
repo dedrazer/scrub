@@ -21,17 +21,18 @@ func (h *Hand) Print() string {
 	return strings.Join(cardStrings, ", ")
 }
 
-func (h *Hand) Log(logger *zap.Logger) {
+func (h *Hand) Log(logger *zap.Logger, args ...string) {
 	if len(h.cards) == 0 {
 		logger.Info("hand", zap.String("cards", "empty"))
 		return
 	}
 
-	logger.Info("hand", zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
-}
+	if len(args) == 0 {
+		logger.Info("hand", zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
+		return
+	}
 
-func (h *Hand) DealerLog(logger *zap.Logger) {
-	logger.Info("dealer hand", zap.String("card", h.cards[1].Print()))
+	logger.Info(args[0], zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
 }
 
 func (h *Hand) PrintValue() string {

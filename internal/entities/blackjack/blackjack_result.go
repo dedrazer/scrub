@@ -9,7 +9,7 @@ import (
 var t = true
 var f = false
 
-func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand Hand) ([]*bool, error) {
+func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) ([]*bool, error) {
 	logger.Info("calculating results")
 	results := make([]*bool, len(playerHands))
 

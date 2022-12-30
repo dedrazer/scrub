@@ -8,15 +8,15 @@ import (
 	"go.uber.org/zap"
 )
 
-func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand Hand) error {
+func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) error {
 	logger.Info("playing round")
 	for i, h := range playerHands {
 		logger.Info("turn", zap.Int("player", i+1))
 
 		input := "y"
 
+		dealerHand.DealerLog(logger)
 		for input == "y" && !h.Bust() {
-			dealerHand.DealerLog(logger)
 			h.Log(logger)
 			fmt.Println("Take card? (y/N)")
 			_, err := fmt.Scanln(&input)
@@ -43,7 +43,17 @@ func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand Han
 	}
 
 	for i, result := range results {
-		logger.Info("result", zap.Int("player", i+1), zap.Any("result", result))
+		player := "player " + fmt.Sprint(i+1)
+		status := ""
+
+		if result == nil {
+			status = "push"
+		} else if *result == false {
+			status = "bust"
+		} else if *result == true {
+			status = "win"
+		}
+		logger.Info(player, zap.String("status", status))
 	}
 
 	return nil
