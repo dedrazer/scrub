@@ -6,8 +6,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var t = true
-var f = false
+var (
+	win  = true
+	loss = false
+)
 
 func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) ([]*bool, error) {
 	logger.Info("calculating results")
@@ -21,24 +23,24 @@ func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand 
 	if dealerHand.Bust() {
 		logger.Info("dealer bust")
 		for i := range results {
-			results[i] = &t
+			results[i] = &win
 		}
 		return results, nil
 	}
 
 	for i, h := range playerHands {
 		if h.Bust() {
-			results[i] = &f
+			results[i] = &loss
 			continue
 		}
 
 		if h.UpperValue() < dealerHand.UpperValue() {
-			results[i] = &f
+			results[i] = &loss
 			continue
 		}
 
 		if h.UpperValue() > dealerHand.UpperValue() {
-			results[i] = &t
+			results[i] = &win
 			continue
 		}
 	}
