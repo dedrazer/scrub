@@ -35,6 +35,10 @@ func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand Dea
 				c.Log(logger)
 			}
 		}
+
+		if h.Bust() {
+			logger.Info("player bust")
+		}
 	}
 
 	results, err := bj.Results(logger, playerHands, dealerHand)
@@ -49,7 +53,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand Dea
 		if result == nil {
 			status = "push"
 		} else if *result == false {
-			status = "bust"
+			status = "lose"
 		} else if *result == true {
 			status = "win"
 		}
