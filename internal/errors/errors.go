@@ -15,5 +15,5 @@ var (
 )
 
 func ErrFailedSubMethod(methodName string, err error) error {
-	return errors.New(fmt.Sprintf(errFailedSubMethod, methodName, err))
+	return fmt.Errorf(errFailedSubMethod, methodName, err)
 }

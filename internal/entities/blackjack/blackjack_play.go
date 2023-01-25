@@ -50,11 +50,11 @@ func (bj *Blackjack) Play(logger *zap.Logger, playerHands []Hand, dealerHand Dea
 		player := "player " + fmt.Sprint(i+1)
 		status := ""
 
-		if result == nil {
+		if result.Status == nil {
 			status = "push"
-		} else if *result == false {
+		} else if *result.Status == false {
 			status = "lose"
-		} else if *result == true {
+		} else if *result.Status == true {
 			status = "win"
 		}
 		logger.Info(player, zap.String("status", status))

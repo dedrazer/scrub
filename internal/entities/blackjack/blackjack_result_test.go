@@ -13,7 +13,7 @@ func TestBlackjack_Result(t *testing.T) {
 		name             string
 		inputPlayerHands []Hand
 		inputDealerHand  DealerHand
-		expectedResults  []*bool
+		expectedResults  []Result
 		expectedErr      error
 	}
 
@@ -57,8 +57,10 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			expectedResults: []*bool{
-				&win,
+			expectedResults: []Result{
+				{
+					Status: &win,
+				},
 			},
 		},
 		{
@@ -100,8 +102,10 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			expectedResults: []*bool{
-				&loss,
+			expectedResults: []Result{
+				{
+					Status: &loss,
+				},
 			},
 		},
 		{
@@ -138,8 +142,10 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			expectedResults: []*bool{
-				nil,
+			expectedResults: []Result{
+				{
+					Status: nil,
+				},
 			},
 		},
 	}
@@ -150,7 +156,7 @@ func TestBlackjack_Result(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			bj := NewBlackjack(numberOfDecks)
-			var results []*bool
+			var results []Result
 			results, err = bj.Results(logger, tc.inputPlayerHands, tc.inputDealerHand)
 
 			if tc.expectedErr != nil {

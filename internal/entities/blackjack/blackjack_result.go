@@ -11,36 +11,52 @@ var (
 	loss = false
 )
 
-func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) ([]*bool, error) {
+type Result struct {
+	Status      *bool
+	Credit      int
+	IsBlackjack bool
+}
+
+func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) ([]Result, error) {
 	logger.Info("calculating results")
-	results := make([]*bool, len(playerHands))
+	results := make([]Result, len(playerHands))
 
 	err := bj.DrawDealerCards(logger, &dealerHand)
 	if err != nil {
 		return nil, errors.ErrFailedSubMethod("DrawDealerCards", err)
 	}
 
+	dealerBust := false
 	if dealerHand.Bust() {
 		logger.Info("dealer bust")
+		dealerBust = true
 		for i := range results {
-			results[i] = &win
+			// default all players who have not busted to win
+			if !playerHands[i].Bust() {
+				results[i].Status = &win
+			}
 		}
-		return results, nil
 	}
 
 	for i, h := range playerHands {
 		if h.Bust() {
-			results[i] = &loss
+			results[i].Status = &loss
 			continue
 		}
 
-		if h.UpperValue() < dealerHand.UpperValue() {
-			results[i] = &loss
-			continue
+		if !dealerBust {
+			if h.UpperValue() < dealerHand.UpperValue() {
+				results[i].Status = &loss
+				continue
+			}
+		}
+
+		if h.UpperValue() == 21 {
+			results[i].IsBlackjack = true
 		}
 
 		if h.UpperValue() > dealerHand.UpperValue() {
-			results[i] = &win
+			results[i].Status = &win
 			continue
 		}
 	}

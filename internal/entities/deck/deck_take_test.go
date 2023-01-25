@@ -23,7 +23,7 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			expectedCards: []*Card{
 				{
 					Symbol: "Ace",
-					Value:  11,
+					Value:  1,
 					Suit:   "Clubs",
 				},
 			},
@@ -52,7 +52,7 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			expectedCards: []*Card{
 				{
 					Symbol: "Ace",
-					Value:  11,
+					Value:  1,
 					Suit:   "Clubs",
 				},
 				{

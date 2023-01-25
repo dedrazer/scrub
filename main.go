@@ -10,10 +10,10 @@ import (
 func main() {
 	config := zap.NewProductionConfig()
 	config.DisableCaller = true
-	
+
 	logger, err := config.Build()
 	if err != nil {
-		panic(fmt.Sprintf("failed to init zap: %w ", err))
+		panic(fmt.Sprintf("failed to init zap: %s ", err.Error()))
 	}
 
 	//deck.Demo(logger)
