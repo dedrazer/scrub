@@ -5,8 +5,11 @@ import (
 	"scrub/internal/errors"
 )
 
-func (bj *Blackjack) DealRound(numberOfHands uint8) (playerHands []Hand, dealerHand DealerHand, err error) {
-	playerHands = make([]Hand, numberOfHands)
+func (bj *Blackjack) DealRound(betAmounts []uint64) (playerHands []Hand, dealerHand DealerHand, err error) {
+	playerHands = make([]Hand, len(betAmounts))
+	for i := range betAmounts {
+		playerHands[i].betAmount = betAmounts[i]
+	}
 
 	// Deal first card to each player
 	err = bj.DealRoundOfCards(&playerHands)
