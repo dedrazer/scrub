@@ -1,5 +1,7 @@
 # scrub
 
 ## todo
-- double down
 - betting/crediting
+- double down
+- split
+- insurance
