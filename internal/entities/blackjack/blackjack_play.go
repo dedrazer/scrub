@@ -48,7 +48,9 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 	}
 
 	for _, p := range players {
-		p.PrintResult(logger)
+		if err := p.PrintResult(logger); err != nil {
+			return errors.ErrFailedSubMethod("PrintResult", err)
+		}
 	}
 
 	return nil
