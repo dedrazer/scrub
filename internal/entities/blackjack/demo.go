@@ -21,20 +21,20 @@ func Demo(logger *zap.Logger) {
 	}
 
 	logger.Info("dealing round", zap.Any("playerBets", playerBets))
-	playerHands, dealerHand, err := testBlackjack.DealRound(playerBets)
+	players, dealerHand, err := testBlackjack.DealRound(playerBets)
 	if err != nil {
 		logger.Fatal("failed to deal round", zap.Error(err))
 	}
 
 	dealerHand.DealerLog(logger)
 
-	for i, ph := range playerHands {
-		for j := range ph.Hands {
+	for i, p := range players {
+		for j := range p.Hands {
 			logger.Info("player hand", zap.Int("player", i+1), zap.Int("hand", j+1))
-			ph.Hands[j].Log(logger)
+			p.Hands[j].Log(logger)
 		}
 	}
-	err = testBlackjack.Play(logger, playerHands, dealerHand)
+	err = testBlackjack.Play(logger, players, dealerHand)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}

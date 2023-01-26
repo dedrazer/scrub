@@ -8,6 +8,9 @@ import (
 
 func (bj *Blackjack) DealRound(playerBets []player.PlayerBet) (players []BlackJackPlayer, dealerHand DealerHand, err error) {
 	players = make([]BlackJackPlayer, len(playerBets))
+	for i, p := range players {
+		p.PlayerBet = playerBets[i]
+	}
 
 	// Deal first card to each player
 	err = bj.DealRoundOfCards(players)
@@ -44,6 +47,9 @@ func (bj *Blackjack) DealRound(playerBets []player.PlayerBet) (players []BlackJa
 
 func (bj *Blackjack) DealRoundOfCards(players []BlackJackPlayer) error {
 	for i := range players {
+		if len(players[i].Hands) == 0 {
+			players[i].Hands = make([]Hand, 1)
+		}
 		for j := range players[i].Hands {
 			card, err := bj.DealCard()
 			if err != nil {
