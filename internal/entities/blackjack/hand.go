@@ -9,8 +9,8 @@ import (
 )
 
 type Hand struct {
-	cards     []deck.Card
-	betAmount uint64
+	cards  []deck.Card
+	result *string
 }
 
 func (h *Hand) Print() string {
@@ -84,4 +84,8 @@ func (h *Hand) AddCard(c deck.Card) {
 		h.cards = []deck.Card{}
 	}
 	h.cards = append(h.cards, c)
+}
+
+func (h *Hand) Blackjack() bool {
+	return len(h.cards) == 2 && h.UpperValue() == 21
 }

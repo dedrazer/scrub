@@ -1,15 +1,27 @@
 package blackjack
 
-import "go.uber.org/zap"
+import (
+	"scrub/internal/entities/player"
+
+	"go.uber.org/zap"
+)
 
 func Demo(logger *zap.Logger) {
 	logger.Info("initialising blackjack")
 	testBlackjack := NewBlackjack(6)
 
-	var numberOfHands uint8 = 1
+	playerBets := []player.PlayerBet{
+		{
+			Player: player.Player{
+				Name:    "Martin",
+				Credits: 1000,
+			},
+			BetAmount: 50,
+		},
+	}
 
-	logger.Info("dealing round", zap.Uint8("numberOfHands", numberOfHands))
-	playerHands, dealerHand, err := testBlackjack.DealRound(numberOfHands)
+	logger.Info("dealing round", zap.Any("playerBets", playerBets))
+	playerHands, dealerHand, err := testBlackjack.DealRound(playerBets)
 	if err != nil {
 		logger.Fatal("failed to deal round", zap.Error(err))
 	}
@@ -17,8 +29,10 @@ func Demo(logger *zap.Logger) {
 	dealerHand.DealerLog(logger)
 
 	for i, ph := range playerHands {
-		logger.Info("player hand", zap.Int("player", i+1))
-		ph.Log(logger)
+		for j := range ph.Hands {
+			logger.Info("player hand", zap.Int("player", i+1), zap.Int("hand", j+1))
+			ph.Hands[j].Log(logger)
+		}
 	}
 	err = testBlackjack.Play(logger, playerHands, dealerHand)
 	if err != nil {

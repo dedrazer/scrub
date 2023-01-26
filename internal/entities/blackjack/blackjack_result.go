@@ -1,65 +1,91 @@
 package blackjack
 
 import (
-	"scrub/internal/errors"
+	"errors"
+	internalErrors "scrub/internal/errors"
 
 	"go.uber.org/zap"
 )
 
 var (
-	win  = true
-	loss = false
+	win       = "win"
+	loss      = "loss"
+	push      = "push"
+	blackjack = "blackjack"
 )
 
-type Result struct {
-	Status      *bool
-	Credit      int
-	IsBlackjack bool
-}
-
-func (bj *Blackjack) Results(logger *zap.Logger, playerHands []Hand, dealerHand DealerHand) ([]Result, error) {
+func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
 	logger.Info("calculating results")
-	results := make([]Result, len(playerHands))
 
 	err := bj.DrawDealerCards(logger, &dealerHand)
 	if err != nil {
-		return nil, errors.ErrFailedSubMethod("DrawDealerCards", err)
+		return internalErrors.ErrFailedSubMethod("DrawDealerCards", err)
 	}
 
 	dealerBust := false
 	if dealerHand.Bust() {
 		logger.Info("dealer bust")
 		dealerBust = true
-		for i := range results {
-			// default all players who have not busted to win
-			if !playerHands[i].Bust() {
-				results[i].Status = &win
-			}
-		}
 	}
 
-	for i, h := range playerHands {
-		if h.Bust() {
-			results[i].Status = &loss
-			continue
-		}
-
-		if !dealerBust {
-			if h.UpperValue() < dealerHand.UpperValue() {
-				results[i].Status = &loss
+	for i, p := range players {
+		for j, h := range p.Hands {
+			if h.Bust() {
+				players[i].Hands[j].result = &loss
 				continue
 			}
-		}
 
-		if h.UpperValue() == 21 {
-			results[i].IsBlackjack = true
-		}
+			if h.Blackjack() && !dealerHand.Blackjack() {
+				players[i].Hands[j].result = &blackjack
+				continue
+			}
 
-		if h.UpperValue() > dealerHand.UpperValue() {
-			results[i].Status = &win
-			continue
+			if dealerBust {
+				players[i].Hands[j].result = &win
+				continue
+			}
+
+			if h.UpperValue() < dealerHand.UpperValue() {
+				players[i].Hands[j].result = &loss
+				continue
+			}
+
+			if h.UpperValue() > dealerHand.UpperValue() {
+				players[i].Hands[j].result = &win
+				continue
+			}
+
+			if h.UpperValue() == dealerHand.UpperValue() {
+				players[i].Hands[j].result = &push
+				continue
+			}
+
+			return errors.New("unexpected case")
 		}
 	}
 
-	return results, nil
+	for i, p := range players {
+		for _, h := range p.Hands {
+			if h.result == nil {
+				return errors.New("unexpected nil result")
+			}
+			res := *h.result
+
+			switch res {
+			case win:
+				players[i].PlayerBet.Win(p.PlayerBet.BetAmount)
+			case loss:
+				err = players[i].PlayerBet.Lose()
+				if err != nil {
+					return internalErrors.ErrFailedSubMethod("Lose", err)
+				}
+			case push:
+				players[i].PlayerBet.Win(0)
+			case blackjack:
+				players[i].PlayerBet.Win(uint64(float64(p.PlayerBet.BetAmount) * 1.5))
+			}
+		}
+	}
+
+	return nil
 }

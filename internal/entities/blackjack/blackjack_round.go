@@ -2,17 +2,15 @@ package blackjack
 
 import (
 	"scrub/internal/entities/deck"
+	"scrub/internal/entities/player"
 	"scrub/internal/errors"
 )
 
-func (bj *Blackjack) DealRound(betAmounts []uint64) (playerHands []Hand, dealerHand DealerHand, err error) {
-	playerHands = make([]Hand, len(betAmounts))
-	for i := range betAmounts {
-		playerHands[i].betAmount = betAmounts[i]
-	}
+func (bj *Blackjack) DealRound(playerBets []player.PlayerBet) (players []BlackJackPlayer, dealerHand DealerHand, err error) {
+	players = make([]BlackJackPlayer, len(playerBets))
 
 	// Deal first card to each player
-	err = bj.DealRoundOfCards(&playerHands)
+	err = bj.DealRoundOfCards(players)
 	if err != nil {
 		return nil, dealerHand, errors.ErrFailedSubMethod("DealRoundOfCards", err)
 	}
@@ -28,7 +26,7 @@ func (bj *Blackjack) DealRound(betAmounts []uint64) (playerHands []Hand, dealerH
 	dealerHand.cards[0] = *dealerCardDown
 
 	// Deal second card to each player
-	err = bj.DealRoundOfCards(&playerHands)
+	err = bj.DealRoundOfCards(players)
 	if err != nil {
 		return nil, dealerHand, errors.ErrFailedSubMethod("DealRoundOfCards", err)
 	}
@@ -41,17 +39,19 @@ func (bj *Blackjack) DealRound(betAmounts []uint64) (playerHands []Hand, dealerH
 
 	dealerHand.cards[1] = *dealerCardUp
 
-	return playerHands, dealerHand, err
+	return players, dealerHand, err
 }
 
-func (bj *Blackjack) DealRoundOfCards(playerHands *[]Hand) error {
-	for i := range *playerHands {
-		card, err := bj.DealCard()
-		if err != nil {
-			return err
-		}
+func (bj *Blackjack) DealRoundOfCards(players []BlackJackPlayer) error {
+	for i := range players {
+		for j := range players[i].Hands {
+			card, err := bj.DealCard()
+			if err != nil {
+				return err
+			}
 
-		(*playerHands)[i].AddCard(*card)
+			players[i].Hands[j].AddCard(*card)
+		}
 	}
 
 	return nil

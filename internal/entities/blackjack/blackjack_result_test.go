@@ -1,7 +1,10 @@
 package blackjack
 
 import (
+	"fmt"
 	"scrub/internal/entities/deck"
+	"scrub/internal/entities/player"
+	internalTesting "scrub/internal/testing"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,28 +13,40 @@ import (
 
 func TestBlackjack_Result(t *testing.T) {
 	type testCase struct {
-		name             string
-		inputPlayerHands []Hand
-		inputDealerHand  DealerHand
-		expectedResults  []Result
-		expectedErr      error
+		name                  string
+		inputPlayers          []BlackJackPlayer
+		inputDealerHand       DealerHand
+		expectedResultCredits []uint64
+		expectedErr           error
+	}
+
+	testPlayerBet := player.PlayerBet{
+		Player: player.Player{
+			Credits: 1000,
+		},
+		BetAmount: 50,
 	}
 
 	testCases := []testCase{
 		{
 			name: "OK Dealer Bust",
-			inputPlayerHands: []Hand{
+			inputPlayers: []BlackJackPlayer{
 				{
-					cards: []deck.Card{
+					PlayerBet: testPlayerBet,
+					Hands: []Hand{
 						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "King",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Queen",
+							cards: []deck.Card{
+								{
+									Value:  10,
+									Suit:   "Clubs",
+									Symbol: "King",
+								},
+								{
+									Value:  10,
+									Suit:   "Diamonds",
+									Symbol: "Queen",
+								},
+							},
 						},
 					},
 				},
@@ -57,26 +72,94 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			expectedResults: []Result{
-				{
-					Status: &win,
-				},
-			},
+			expectedResultCredits: []uint64{1050},
 		},
 		{
 			name: "OK Player Bust",
-			inputPlayerHands: []Hand{
+			inputPlayers: []BlackJackPlayer{
 				{
+					PlayerBet: testPlayerBet,
+					Hands: []Hand{
+						{
+							cards: []deck.Card{
+								{
+									Value:  10,
+									Suit:   "Clubs",
+									Symbol: "King",
+								},
+								{
+									Value:  10,
+									Suit:   "Diamonds",
+									Symbol: "Queen",
+								},
+								{
+									Value:  2,
+									Suit:   "Hearts",
+									Symbol: "2",
+								},
+							},
+						},
+					},
+				},
+			},
+			inputDealerHand: DealerHand{
+				Hand: Hand{
 					cards: []deck.Card{
 						{
 							Value:  10,
 							Suit:   "Clubs",
-							Symbol: "King",
+							Symbol: "Queen",
 						},
 						{
 							Value:  10,
 							Suit:   "Diamonds",
+							Symbol: "Jack",
+						},
+					},
+				},
+			},
+			expectedResultCredits: []uint64{950},
+		},
+		{
+			name: "OK Player & Dealer Bust",
+			inputPlayers: []BlackJackPlayer{
+				{
+					PlayerBet: testPlayerBet,
+					Hands: []Hand{
+						{
+							cards: []deck.Card{
+								{
+									Value:  10,
+									Suit:   "Clubs",
+									Symbol: "King",
+								},
+								{
+									Value:  10,
+									Suit:   "Diamonds",
+									Symbol: "Queen",
+								},
+								{
+									Value:  2,
+									Suit:   "Hearts",
+									Symbol: "2",
+								},
+							},
+						},
+					},
+				},
+			},
+			inputDealerHand: DealerHand{
+				Hand: Hand{
+					cards: []deck.Card{
+						{
+							Value:  10,
+							Suit:   "Clubs",
 							Symbol: "Queen",
+						},
+						{
+							Value:  10,
+							Suit:   "Diamonds",
+							Symbol: "Jack",
 						},
 						{
 							Value:  2,
@@ -86,42 +169,27 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			inputDealerHand: DealerHand{
-				Hand: Hand{
-					cards: []deck.Card{
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "Queen",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Jack",
-						},
-					},
-				},
-			},
-			expectedResults: []Result{
-				{
-					Status: &loss,
-				},
-			},
+			expectedResultCredits: []uint64{950},
 		},
 		{
 			name: "OK Push",
-			inputPlayerHands: []Hand{
+			inputPlayers: []BlackJackPlayer{
 				{
-					cards: []deck.Card{
+					PlayerBet: testPlayerBet,
+					Hands: []Hand{
 						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "King",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Queen",
+							cards: []deck.Card{
+								{
+									Value:  10,
+									Suit:   "Clubs",
+									Symbol: "King",
+								},
+								{
+									Value:  10,
+									Suit:   "Diamonds",
+									Symbol: "Queen",
+								},
+							},
 						},
 					},
 				},
@@ -142,22 +210,17 @@ func TestBlackjack_Result(t *testing.T) {
 					},
 				},
 			},
-			expectedResults: []Result{
-				{
-					Status: nil,
-				},
-			},
+			expectedResultCredits: []uint64{1000},
 		},
 	}
 
 	var numberOfDecks uint = 4
 	logger, err := zap.NewDevelopment()
 	require.NoError(t, err, "zap.NewDevelopment() setup error")
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+	for i, tc := range testCases {
+		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, i, tc.name), func(t *testing.T) {
 			bj := NewBlackjack(numberOfDecks)
-			var results []Result
-			results, err = bj.Results(logger, tc.inputPlayerHands, tc.inputDealerHand)
+			err = bj.Results(logger, tc.inputPlayers, tc.inputDealerHand)
 
 			if tc.expectedErr != nil {
 				require.ErrorContains(t, err, tc.expectedErr.Error(), "expected error message")
@@ -165,7 +228,9 @@ func TestBlackjack_Result(t *testing.T) {
 			}
 
 			require.NoError(t, err, "unexpected error")
-			require.EqualValues(t, tc.expectedResults, results, "expected results")
+			for j, inputPlayer := range tc.inputPlayers {
+				require.Equal(t, tc.expectedResultCredits[j], inputPlayer.PlayerBet.Player.Credits, "player credits. expected: %d, actual: %d.", tc.expectedResultCredits[j], inputPlayer.PlayerBet.Player.Credits)
+			}
 		})
 	}
 }

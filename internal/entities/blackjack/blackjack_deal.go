@@ -3,7 +3,7 @@ package blackjack
 import (
 	"errors"
 	"scrub/internal/entities/deck"
-	internal "scrub/internal/errors"
+	internalErrors "scrub/internal/errors"
 
 	"go.uber.org/zap"
 )
@@ -11,7 +11,7 @@ import (
 func (bj *Blackjack) DealCard() (*deck.Card, error) {
 	card, err := bj.deck.TakeCardByIndex(0)
 	if err != nil {
-		return nil, internal.ErrFailedSubMethod("TakeCardByIndex", err)
+		return nil, internalErrors.ErrFailedSubMethod("TakeCardByIndex", err)
 	}
 
 	return card, nil
