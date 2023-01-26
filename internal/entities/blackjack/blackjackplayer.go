@@ -15,7 +15,7 @@ type BlackJackPlayer struct {
 func (bjp *BlackJackPlayer) PrintResult(logger *zap.Logger) error {
 	for i, h := range bjp.Hands {
 		if h.result == nil {
-			return errors.ErrUnexcpectedNil
+			return errors.ErrUnexpectedNil
 		}
 		logger.Info("player result", zap.Int("hand", i+1), zap.String("result", *h.result), zap.Uint64("credits", bjp.PlayerBet.Player.Credits))
 	}
