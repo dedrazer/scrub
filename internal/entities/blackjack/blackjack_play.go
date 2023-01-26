@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"scrub/internal/entities/deck"
 	"scrub/internal/errors"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -19,6 +20,32 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 			dealerHand.DealerLog(logger)
 			for input == "y" && !h.Bust() {
 				h.Log(logger)
+
+				if len(h.cards) == 2 {
+					var doubleDownInput string
+					fmt.Println("Double down? (y/N)")
+					_, err := fmt.Scanln(&doubleDownInput)
+					if err != nil {
+						return errors.ErrFailedSubMethod("fmt.Scanln", err)
+					}
+					if strings.ToLower(doubleDownInput) == "y" {
+						var c *deck.Card
+						c, err = bj.DealCard()
+						if err != nil {
+							return errors.ErrFailedSubMethod("DealCard", err)
+						}
+
+						// todo: one BetAmount per hand
+						players[i].PlayerBet.BetAmount *= 2
+
+						players[i].Hands[j].AddCard(*c)
+						players[i].Hands[j].Log(logger)
+						
+						input = "n"
+						break
+					}
+				}
+
 				fmt.Println("Take card? (y/N)")
 				_, err := fmt.Scanln(&input)
 				if err != nil {
@@ -32,7 +59,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 						return errors.ErrFailedSubMethod("DealCard", err)
 					}
 
-					h.AddCard(*c)
+					players[i].Hands[j].AddCard(*c)
 					c.Log(logger)
 				}
 			}

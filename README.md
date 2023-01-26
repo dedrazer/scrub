@@ -28,3 +28,21 @@ y
 {"level":"info","ts":1674729307.642857,"msg":"dealer bust"}
 {"level":"info","ts":1674729307.642876,"msg":"player result","hand":1,"result":"win","credits":1050}
 ```
+
+```
+{"level":"info","ts":1674744597.5345159,"msg":"initialising blackjack"}
+{"level":"info","ts":1674744597.542655,"msg":"dealing round","playerBets":[{"Player":{"Name":"Martin","Credits":1000},"BetAmount":50}]}
+{"level":"info","ts":1674744597.542799,"msg":"dealer hand","card":"8 of Spades"}
+{"level":"info","ts":1674744597.542805,"msg":"player hand","player":1,"hand":1}
+{"level":"info","ts":1674744597.542811,"msg":"hand","cards":"9 of Diamonds, Jack of Diamonds","value":"19"}
+{"level":"info","ts":1674744597.542816,"msg":"playing round"}
+{"level":"info","ts":1674744597.542824,"msg":"turn","player":1,"hand":1}
+{"level":"info","ts":1674744597.542828,"msg":"dealer hand","card":"8 of Spades"}
+{"level":"info","ts":1674744597.5428321,"msg":"hand","cards":"9 of Diamonds, Jack of Diamonds","value":"19"}
+Double down? (y/N)
+y
+{"level":"info","ts":1674744600.011611,"msg":"player bust"}
+{"level":"info","ts":1674744600.01164,"msg":"calculating results"}
+{"level":"info","ts":1674744600.011659,"msg":"dealer result","cards":"5 of Hearts, 8 of Spades, 6 of Spades","value":"19"}
+{"level":"info","ts":1674744600.011702,"msg":"player result","hand":1,"result":"push","credits":1000}
+```

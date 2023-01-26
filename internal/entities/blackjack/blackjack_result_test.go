@@ -129,19 +129,24 @@ func TestBlackjack_Result(t *testing.T) {
 						{
 							cards: []deck.Card{
 								{
-									Value:  10,
-									Suit:   "Clubs",
-									Symbol: "King",
+									Value:  7,
+									Suit:   "Spades",
+									Symbol: "7",
 								},
 								{
-									Value:  10,
-									Suit:   "Diamonds",
-									Symbol: "Queen",
-								},
-								{
-									Value:  2,
+									Value:  4,
 									Suit:   "Hearts",
-									Symbol: "2",
+									Symbol: "4",
+								},
+								{
+									Value:  3,
+									Suit:   "Spades",
+									Symbol: "3",
+								},
+								{
+									Value:  8,
+									Suit:   "Clubs",
+									Symbol: "8",
 								},
 							},
 						},
@@ -149,24 +154,23 @@ func TestBlackjack_Result(t *testing.T) {
 				},
 			},
 			inputDealerHand: DealerHand{
-				Hand: Hand{
-					cards: []deck.Card{
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "Queen",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Jack",
-						},
-						{
-							Value:  2,
-							Suit:   "Hearts",
-							Symbol: "2",
-						},
+				Hand: Hand{cards: []deck.Card{
+					{
+						Value:  6,
+						Suit:   "Spades",
+						Symbol: "6",
 					},
+					{
+						Value:  8,
+						Suit:   "Diamonds",
+						Symbol: "8",
+					},
+					{
+						Value:  8,
+						Suit:   "Diamonds",
+						Symbol: "8",
+					},
+				},
 				},
 			},
 			expectedResultCredits: []uint64{950},
