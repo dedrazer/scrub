@@ -1,7 +1,7 @@
 # scrub
 
 ## todo
-- split
+- UT split
 - automated strategy
 - analytics
 - insurance?
