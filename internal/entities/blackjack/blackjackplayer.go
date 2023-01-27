@@ -22,3 +22,12 @@ func (bjp *BlackJackPlayer) PrintResult(logger *zap.Logger) error {
 
 	return nil
 }
+
+func PrintAllResults(logger *zap.Logger, blackjackPlayers []BlackJackPlayer) error {
+	for i := range blackjackPlayers {
+		if err := blackjackPlayers[i].PrintResult(logger); err != nil {
+			return err
+		}
+	}
+	return nil
+}
