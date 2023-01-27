@@ -11,15 +11,13 @@ import (
 
 var (
 	acceptedInputs = map[string][]string{
-		"first": {"h", "d", "x"},
-		"split": {"h", "s", "d", "x"},
-		"hit":   {"h", "x"},
+		"first": {"h", "d", "s"},
+		"hit":   {"h", "s"},
 	}
 
 	prompts = map[string]string{
-		"first": "hit/double down/stand? (h/d/x)",
-		"split": "hit/split/double down/stand? (h/s/d/x)",
-		"hit":   "hit/stand? (h/x)",
+		"first": "hit/double down/stand? (h/d/s)",
+		"hit":   "hit/stand? (h/s)",
 	}
 )
 
@@ -30,28 +28,41 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 		logger.Info("playing round")
 		for i, p := range players {
 			for j := range p.Hands {
-				if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[0].Symbol {
-					// split here?
+				if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[1].Symbol {
+					p.Hands[j].Log(logger)
+					fmt.Println("Split? (y/n)")
+					var input string
+					_, err := fmt.Scanln(&input)
+					if err != nil {
+						return errors.ErrFailedSubMethod("fmt.Scanln", err)
+					}
+
+					input = strings.ToLower(input)
+					if input == "y" {
+						splitHand := Hand{
+							cards:   []deck.Card{p.Hands[j].cards[1]},
+							isSplit: true,
+						}
+						players[i].Hands[j].cards = p.Hands[j].cards[:1]
+						players[i].Hands[j].isSplit = true
+						players[i].Hands = append(p.Hands, splitHand)
+					}
 				}
 			}
 
-			for j := range p.Hands {
+			for j := range players[i].Hands {
 				logger.Info("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
 
 				var input string
 				kind := "hit"
 
 				dealerHand.DealerLog(logger)
-				for input != "x" && !players[i].Hands[j].Bust() && players[i].Hands[j].UpperValue() != 21 {
+				for input != "s" && !players[i].Hands[j].Bust() && players[i].Hands[j].UpperValue() != 21 {
 					players[i].Hands[j].Log(logger)
 
 					kind = "hit"
-					if len(players[i].Hands[j].cards) == 2 {
-						if players[i].Hands[j].cards[0].Symbol == players[i].Hands[j].cards[1].Symbol {
-							kind = "split"
-						} else {
-							kind = "first"
-						}
+					if len(players[i].Hands[j].cards) == 2 && !players[i].Hands[j].isSplit {
+						kind = "first"
 
 						if players[i].Hands[j].UpperValue() == 21 {
 							logger.Info("player has blackjack")
@@ -76,10 +87,6 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 
 					if !validInput {
 						return errors.ErrInvalidInput
-					}
-
-					if input == "s" {
-						//todo: manually call a Round function
 					}
 
 					if input == "d" {

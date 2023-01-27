@@ -10,6 +10,7 @@ import (
 
 type Hand struct {
 	cards     []deck.Card
+	isSplit   bool
 	result    *string
 	betAmount uint64
 }
@@ -68,6 +69,10 @@ func (h *Hand) Value() []uint {
 		return []uint{total, total + 10}
 	}
 
+	if total == 2 {
+		total = 12
+	}
+
 	return []uint{total}
 }
 
@@ -88,5 +93,5 @@ func (h *Hand) AddCard(c deck.Card) {
 }
 
 func (h *Hand) Blackjack() bool {
-	return len(h.cards) == 2 && h.UpperValue() == 21
+	return len(h.cards) == 2 && h.UpperValue() == 21 && !h.isSplit
 }
