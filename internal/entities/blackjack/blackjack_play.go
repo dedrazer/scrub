@@ -36,7 +36,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 				kind := "hit"
 
 				dealerHand.DealerLog(logger)
-				for input != "x" && !players[i].Hands[j].Bust() {
+				for input != "x" && !players[i].Hands[j].Bust() && players[i].Hands[j].UpperValue() != 21 {
 					players[i].Hands[j].Log(logger)
 
 					kind = "hit"
