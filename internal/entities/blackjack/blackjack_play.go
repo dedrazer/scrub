@@ -65,6 +65,10 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 					return errors.ErrInvalidInput
 				}
 
+				if input == "s" {
+					//todo: manually call a Round function
+				}
+
 				if input == "d" {
 					var c *deck.Card
 					c, err = bj.DealCard()
