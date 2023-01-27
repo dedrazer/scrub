@@ -44,6 +44,11 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 					} else {
 						kind = "first"
 					}
+
+					if players[i].Hands[j].UpperValue() == 21 {
+						logger.Info("player has blackjack")
+						break
+					}
 				}
 
 				fmt.Println(prompts[kind])

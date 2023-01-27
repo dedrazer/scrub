@@ -23,7 +23,7 @@ func Demo(logger *zap.Logger) {
 				Name:    "Fran",
 				Credits: 1000,
 			},
-			BetAmount: 50,
+			BetAmount: 25,
 		},
 	}
 
@@ -35,12 +35,6 @@ func Demo(logger *zap.Logger) {
 
 	dealerHand.DealerLog(logger)
 
-	for i, p := range players {
-		for j := range p.Hands {
-			logger.Info("player hand", zap.Int("player", i+1), zap.Int("hand", j+1))
-			p.Hands[j].Log(logger)
-		}
-	}
 	err = testBlackjack.Play(logger, players, dealerHand)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
