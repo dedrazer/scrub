@@ -30,6 +30,12 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 		logger.Info("playing round")
 		for i, p := range players {
 			for j := range p.Hands {
+				if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[0].Symbol {
+					// split here?
+				}
+			}
+
+			for j := range p.Hands {
 				logger.Info("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
 
 				var input string
