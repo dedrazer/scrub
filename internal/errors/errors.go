@@ -14,6 +14,7 @@ var (
 	ErrIndexOutOfRange     = errors.New("Index is out of range")
 	ErrInsufficientCredits = errors.New("Insufficient credits")
 	ErrUnexpectedNil       = errors.New("Unexpected nil value")
+	ErrInvalidInput        = errors.New("Invalid input")
 )
 
 func ErrFailedSubMethod(methodName string, err error) error {

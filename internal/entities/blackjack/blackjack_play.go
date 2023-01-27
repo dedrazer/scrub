@@ -9,6 +9,20 @@ import (
 	"go.uber.org/zap"
 )
 
+var (
+	acceptedInputs = map[string][]string{
+		"first": {"h", "d", "x"},
+		"split": {"h", "s", "d", "x"},
+		"hit":   {"h", "x"},
+	}
+
+	prompts = map[string]string{
+		"first": "hit/double down/stand? (h/d/x)",
+		"split": "hit/split/double down/stand? (h/s/d/x)",
+		"hit":   "hit/stand? (h/x)",
+	}
+)
+
 func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
 	logger.Info("playing round")
 	for i, p := range players {
@@ -16,43 +30,58 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 			players[i].Hands[j].betAmount = p.PlayerBet.BetAmount
 			logger.Info("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
 
-			input := "y"
+			var input string
+			kind := "hit"
 
 			dealerHand.DealerLog(logger)
-			for input == "y" && !players[i].Hands[j].Bust() {
+			for input != "x" && !players[i].Hands[j].Bust() {
 				players[i].Hands[j].Log(logger)
 
+				kind = "hit"
 				if len(players[i].Hands[j].cards) == 2 {
-					var doubleDownInput string
-					fmt.Println("Double down? (y/N)")
-					_, err := fmt.Scanln(&doubleDownInput)
-					if err != nil {
-						return errors.ErrFailedSubMethod("fmt.Scanln", err)
-					}
-					if strings.ToLower(doubleDownInput) == "y" {
-						var c *deck.Card
-						c, err = bj.DealCard()
-						if err != nil {
-							return errors.ErrFailedSubMethod("DealCard", err)
-						}
-
-						players[i].Hands[j].betAmount *= 2
-
-						players[i].Hands[j].AddCard(*c)
-						players[i].Hands[j].Log(logger)
-
-						input = "n"
-						break
+					if players[i].Hands[j].cards[0].Symbol == players[i].Hands[j].cards[1].Symbol {
+						kind = "split"
+					} else {
+						kind = "first"
 					}
 				}
 
-				fmt.Println("Take card? (y/N)")
+				fmt.Println(prompts[kind])
 				_, err := fmt.Scanln(&input)
 				if err != nil {
 					return errors.ErrFailedSubMethod("fmt.Scanln", err)
 				}
 
-				if input == "y" {
+				input = strings.ToLower(input)
+				validInput := false
+				for _, v := range acceptedInputs[kind] {
+					if input == v {
+						validInput = true
+						break
+					}
+				}
+
+				if !validInput {
+					return errors.ErrInvalidInput
+				}
+
+				if input == "d" {
+					var c *deck.Card
+					c, err = bj.DealCard()
+					if err != nil {
+						return errors.ErrFailedSubMethod("DealCard", err)
+					}
+
+					players[i].Hands[j].betAmount *= 2
+
+					players[i].Hands[j].AddCard(*c)
+					players[i].Hands[j].Log(logger)
+
+					input = "n"
+					break
+				}
+
+				if input == "h" {
 					var c *deck.Card
 					c, err = bj.DealCard()
 					if err != nil {
