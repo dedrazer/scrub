@@ -17,7 +17,12 @@ func (bjp *BlackJackPlayer) PrintResult(logger *zap.Logger) error {
 		if h.result == nil {
 			return errors.ErrUnexpectedNil
 		}
-		logger.Info("player result", zap.String("player", bjp.Player.Name), zap.Int("hand", i+1), zap.String("result", *h.result), zap.Uint64("credits", bjp.Player.Credits))
+		logger.Info("player result",
+			zap.String("player", bjp.Player.Name),
+			zap.Int("hand", i+1),
+			zap.Uint("hand value", h.UpperValue()),
+			zap.String("result", *h.result),
+			zap.Uint64("credits", bjp.Player.Credits))
 	}
 
 	return nil
