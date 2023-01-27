@@ -20,11 +20,9 @@ func TestBlackjack_Result(t *testing.T) {
 		expectedErr           error
 	}
 
-	testPlayerBet := player.PlayerBet{
-		Player: player.Player{
-			Credits: 1000,
-		},
-		BetAmount: 50,
+	testPlayer := player.Player{
+		Name:    "Player 1",
+		Credits: 1000,
 	}
 
 	testCases := []testCase{
@@ -32,7 +30,7 @@ func TestBlackjack_Result(t *testing.T) {
 			name: "OK Dealer Bust",
 			inputPlayers: []BlackJackPlayer{
 				{
-					PlayerBet: testPlayerBet,
+					Player: testPlayer,
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
@@ -47,6 +45,7 @@ func TestBlackjack_Result(t *testing.T) {
 									Symbol: "Queen",
 								},
 							},
+							betAmount: 50,
 						},
 					},
 				},
@@ -78,7 +77,7 @@ func TestBlackjack_Result(t *testing.T) {
 			name: "OK Player Bust",
 			inputPlayers: []BlackJackPlayer{
 				{
-					PlayerBet: testPlayerBet,
+					Player: testPlayer,
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
@@ -98,6 +97,7 @@ func TestBlackjack_Result(t *testing.T) {
 									Symbol: "2",
 								},
 							},
+							betAmount: 50,
 						},
 					},
 				},
@@ -124,7 +124,7 @@ func TestBlackjack_Result(t *testing.T) {
 			name: "OK Player & Dealer Bust",
 			inputPlayers: []BlackJackPlayer{
 				{
-					PlayerBet: testPlayerBet,
+					Player: testPlayer,
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
@@ -149,6 +149,7 @@ func TestBlackjack_Result(t *testing.T) {
 									Symbol: "8",
 								},
 							},
+							betAmount: 50,
 						},
 					},
 				},
@@ -179,7 +180,7 @@ func TestBlackjack_Result(t *testing.T) {
 			name: "OK Push",
 			inputPlayers: []BlackJackPlayer{
 				{
-					PlayerBet: testPlayerBet,
+					Player: testPlayer,
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
@@ -194,6 +195,7 @@ func TestBlackjack_Result(t *testing.T) {
 									Symbol: "Queen",
 								},
 							},
+							betAmount: 50,
 						},
 					},
 				},
@@ -233,7 +235,7 @@ func TestBlackjack_Result(t *testing.T) {
 
 			require.NoError(t, err, "unexpected error")
 			for j, inputPlayer := range tc.inputPlayers {
-				require.Equal(t, tc.expectedResultCredits[j], inputPlayer.PlayerBet.Player.Credits, "player credits. expected: %d, actual: %d.", tc.expectedResultCredits[j], inputPlayer.PlayerBet.Player.Credits)
+				require.Equal(t, tc.expectedResultCredits[j], inputPlayer.Player.Credits, "player credits. expected: %d, actual: %d.", tc.expectedResultCredits[j], inputPlayer.Player.Credits)
 			}
 		})
 	}
