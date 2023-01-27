@@ -30,10 +30,6 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, deal
 
 	for i, p := range players {
 		for j, h := range p.Hands {
-			if h.betAmount == 0 {
-				players[i].Hands[j].betAmount = p.PlayerBet.BetAmount
-			}
-
 			if h.Bust() {
 				players[i].Hands[j].result = &loss
 				continue
@@ -77,16 +73,16 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, deal
 
 			switch res {
 			case win:
-				players[i].PlayerBet.Win(h.betAmount)
+				players[i].Win(h.betAmount)
 			case loss:
-				err = players[i].PlayerBet.Lose(h.betAmount)
+				err = players[i].Lose(h.betAmount)
 				if err != nil {
 					return internalErrors.ErrFailedSubMethod("Lose", err)
 				}
 			case push:
-				players[i].PlayerBet.Win(0)
+				players[i].Win(0)
 			case blackjack:
-				players[i].PlayerBet.Win(uint64(float64(h.betAmount) * 1.5))
+				players[i].Win(uint64(float64(h.betAmount) * 1.5))
 			}
 		}
 	}

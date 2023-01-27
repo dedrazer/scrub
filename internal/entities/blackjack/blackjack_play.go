@@ -24,12 +24,6 @@ var (
 )
 
 func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
-	for i, p := range players {
-		for j := range p.Hands {
-			players[i].Hands[j].betAmount = p.PlayerBet.BetAmount
-		}
-	}
-
 	if dealerHand.Blackjack() {
 		logger.Info("dealer has blackjack")
 	} else {

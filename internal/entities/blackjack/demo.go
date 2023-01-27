@@ -10,25 +10,36 @@ func Demo(logger *zap.Logger) {
 	logger.Info("initialising blackjack")
 	testBlackjack := NewBlackjack(6)
 
-	playerBets := []player.PlayerBet{
+	players := []BlackJackPlayer{
 		{
 			Player: player.Player{
 				Name:    "Martin",
 				Credits: 1000,
 			},
-			BetAmount: 50,
+			Hands: []Hand{
+				{
+					betAmount: 50,
+				},
+				{
+					betAmount: 100,
+				},
+			},
 		},
 		{
 			Player: player.Player{
 				Name:    "Fran",
 				Credits: 1000,
 			},
-			BetAmount: 25,
+			Hands: []Hand{
+				{
+					betAmount: 25,
+				},
+			},
 		},
 	}
 
-	logger.Info("dealing round", zap.Any("playerBets", playerBets))
-	players, dealerHand, err := testBlackjack.DealRound(playerBets)
+	logger.Info("dealing round", zap.Any("players", players))
+	dealerHand, err := testBlackjack.DealRound(players)
 	if err != nil {
 		logger.Fatal("failed to deal round", zap.Error(err))
 	}

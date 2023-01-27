@@ -7,22 +7,15 @@ type Player struct {
 	Credits uint64
 }
 
-type PlayerBet struct {
-	Player    Player
-	BetAmount uint64
+func (p *Player) Win(amount uint64) {
+	p.Credits += amount
 }
 
-func (pb *PlayerBet) Win(amount uint64) {
-	pb.Player.Credits += amount
-	pb.BetAmount = 0
-}
-
-func (pb *PlayerBet) Lose(amount uint64) error {
-	if pb.Player.Credits < amount {
+func (p *Player) Lose(amount uint64) error {
+	if p.Credits < amount {
 		return errors.ErrInsufficientCredits
 	}
 
-	pb.Player.Credits -= amount
-	pb.BetAmount = 0
+	p.Credits -= amount
 	return nil
 }
