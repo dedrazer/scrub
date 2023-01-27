@@ -12,16 +12,17 @@ import (
 func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
 	logger.Info("playing round")
 	for i, p := range players {
-		for j, h := range p.Hands {
+		for j := range p.Hands {
+			players[i].Hands[j].betAmount = p.PlayerBet.BetAmount
 			logger.Info("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
 
 			input := "y"
 
 			dealerHand.DealerLog(logger)
-			for input == "y" && !h.Bust() {
-				h.Log(logger)
+			for input == "y" && !players[i].Hands[j].Bust() {
+				players[i].Hands[j].Log(logger)
 
-				if len(h.cards) == 2 {
+				if len(players[i].Hands[j].cards) == 2 {
 					var doubleDownInput string
 					fmt.Println("Double down? (y/N)")
 					_, err := fmt.Scanln(&doubleDownInput)
@@ -35,12 +36,11 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 							return errors.ErrFailedSubMethod("DealCard", err)
 						}
 
-						// todo: one BetAmount per hand
-						players[i].PlayerBet.BetAmount *= 2
+						players[i].Hands[j].betAmount *= 2
 
 						players[i].Hands[j].AddCard(*c)
 						players[i].Hands[j].Log(logger)
-						
+
 						input = "n"
 						break
 					}
@@ -64,7 +64,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 				}
 			}
 
-			if h.Bust() {
+			if players[i].Hands[j].Bust() {
 				logger.Info("player bust")
 			}
 		}

@@ -18,6 +18,13 @@ func Demo(logger *zap.Logger) {
 			},
 			BetAmount: 50,
 		},
+		{
+			Player: player.Player{
+				Name:    "Fran",
+				Credits: 1000,
+			},
+			BetAmount: 50,
+		},
 	}
 
 	logger.Info("dealing round", zap.Any("playerBets", playerBets))

@@ -9,8 +9,9 @@ import (
 )
 
 type Hand struct {
-	cards  []deck.Card
-	result *string
+	cards     []deck.Card
+	result    *string
+	betAmount uint64
 }
 
 func (h *Hand) Print() string {

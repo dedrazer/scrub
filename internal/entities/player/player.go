@@ -17,12 +17,12 @@ func (pb *PlayerBet) Win(amount uint64) {
 	pb.BetAmount = 0
 }
 
-func (pb *PlayerBet) Lose() error {
-	if pb.Player.Credits < pb.BetAmount {
+func (pb *PlayerBet) Lose(amount uint64) error {
+	if pb.Player.Credits < amount {
 		return errors.ErrInsufficientCredits
 	}
 
-	pb.Player.Credits -= pb.BetAmount
+	pb.Player.Credits -= amount
 	pb.BetAmount = 0
 	return nil
 }
