@@ -13,3 +13,6 @@ func (dh *DealerHand) DealerLog(logger *zap.Logger) {
 func (dh *DealerHand) DealerResult(logger *zap.Logger) {
 	dh.Log(logger, "dealer result")
 }
+func (dh *DealerHand) UpCardValue() uint {
+	return dh.cards[1].Value
+}

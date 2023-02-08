@@ -2,6 +2,6 @@
 
 ## todo
 - UT split
-- automated strategy
+- var card values
 - analytics
 - insurance?

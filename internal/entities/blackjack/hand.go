@@ -59,6 +59,10 @@ func (h *Hand) Value() []uint {
 	containsAce := false
 	for _, c := range h.cards {
 		if c.Value == 1 {
+			if containsAce && total == 1 {
+				total += 10
+			}
+
 			containsAce = true
 		}
 
@@ -67,10 +71,6 @@ func (h *Hand) Value() []uint {
 
 	if total < 12 && containsAce {
 		return []uint{total, total + 10}
-	}
-
-	if total == 2 {
-		total = 12
 	}
 
 	return []uint{total}
@@ -94,4 +94,12 @@ func (h *Hand) AddCard(c deck.Card) {
 
 func (h *Hand) Blackjack() bool {
 	return len(h.cards) == 2 && h.UpperValue() == 21 && !h.isSplit
+}
+
+func (h *Hand) CanSplit() bool {
+	return !h.isSplit && len(h.cards) == 2 && h.cards[0].Symbol == h.cards[1].Symbol
+}
+
+func (h *Hand) IsSoft() bool {
+	return len(h.Value()) > 1
 }

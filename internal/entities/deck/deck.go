@@ -14,7 +14,7 @@ const (
 
 var (
 	cardSymbols = []string{"Ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"}
-	cardValues  = map[string]uint{
+	CardValues  = map[string]uint{
 		"Ace":   1,
 		"2":     2,
 		"3":     3,
@@ -40,7 +40,7 @@ type Card struct {
 
 func NewCard(symbol, suit string) Card {
 	return Card{
-		Value:  cardValues[symbol],
+		Value:  CardValues[symbol],
 		Symbol: symbol,
 		Suit:   suit,
 	}
