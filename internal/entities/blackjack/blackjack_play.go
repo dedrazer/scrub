@@ -37,6 +37,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 					action := strategy(p.Hands[j], dealerHand)
 
 					if action == split {
+						logger.Info("splitting hand", zap.Int("player", i+1), zap.Int("hand", j+1))
 						if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[1].Symbol {
 							splitHand := Hand{
 								cards:   []deck.Card{p.Hands[j].cards[1]},

@@ -37,15 +37,15 @@ func Strategy1(playerHand Hand, dealerHand DealerHand) string {
 			if dealerHand.UpCardValue() < 3 || dealerHand.UpCardValue() > 6 {
 				return hit
 			}
-			return double
+			return DoubleIfPossible(playerHand)
 		case 16, 15:
 			if dealerHand.UpCardValue() < 4 || dealerHand.UpCardValue() > 6 {
 				return hit
 			}
-			return double
+			return DoubleIfPossible(playerHand)
 		case 14, 13:
 			if dealerHand.UpCardValue() < 5 || dealerHand.UpCardValue() > 6 {
-				return double
+				return DoubleIfPossible(playerHand)
 			}
 		}
 	}
@@ -66,18 +66,22 @@ func Strategy1(playerHand Hand, dealerHand DealerHand) string {
 		}
 		return stand
 	case 11:
-		return double
+		return DoubleIfPossible(playerHand)
 	case 10:
-		if dealerHand.UpCardValue() < 10 {
-			return double
-		}
-		return hit
+		return DoubleIfPossible(playerHand)
 	case 9:
 		if dealerHand.UpCardValue() < 3 || dealerHand.UpCardValue() > 6 {
 			return hit
 		}
-		return double
+		return DoubleIfPossible(playerHand)
 	default:
 		return hit
 	}
+}
+
+func DoubleIfPossible(h Hand) string {
+	if h.CanDouble() {
+		return double
+	}
+	return hit
 }
