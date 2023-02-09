@@ -104,7 +104,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 							return errors.ErrFailedSubMethod("DealCard", err)
 						}
 
-						players[i].Hands[j].betAmount *= 2
+						players[i].Hands[j].BetAmount *= 2
 
 						players[i].Hands[j].AddCard(*c)
 						players[i].Hands[j].Log(logger)

@@ -6,6 +6,14 @@ import (
 )
 
 func (bj *Blackjack) DealRound(players []BlackJackPlayer) (dealerHand DealerHand, err error) {
+	for i := range players {
+		for j := range players[i].Hands {
+			if len(players[i].Hands[j].cards) > 0 {
+				players[i].Hands[j].cards = []deck.Card{}
+			}
+		}
+	}
+
 	// Deal first card to each player
 	err = bj.DealRoundOfCards(players)
 	if err != nil {

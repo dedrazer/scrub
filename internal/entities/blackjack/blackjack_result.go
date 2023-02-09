@@ -73,16 +73,16 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, deal
 
 			switch res {
 			case win:
-				players[i].Win(h.betAmount)
+				players[i].Win(h.BetAmount)
 			case loss:
-				err = players[i].Lose(h.betAmount)
+				err = players[i].Lose(h.BetAmount)
 				if err != nil {
 					return internalErrors.ErrFailedSubMethod("Lose", err)
 				}
 			case push:
 				players[i].Win(0)
 			case blackjack:
-				players[i].Win(uint64(float64(h.betAmount) * 1.5))
+				players[i].Win(uint64(float64(h.BetAmount) * 1.5))
 			}
 		}
 	}

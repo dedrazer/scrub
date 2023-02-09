@@ -12,7 +12,7 @@ type Hand struct {
 	cards     []deck.Card
 	isSplit   bool
 	result    *string
-	betAmount uint64
+	BetAmount uint64
 }
 
 func (h *Hand) Print() string {

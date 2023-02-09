@@ -18,10 +18,10 @@ func Demo(logger *zap.Logger) {
 			},
 			Hands: []Hand{
 				{
-					betAmount: 50,
+					BetAmount: 50,
 				},
 				{
-					betAmount: 100,
+					BetAmount: 100,
 				},
 			},
 		},
@@ -32,7 +32,7 @@ func Demo(logger *zap.Logger) {
 			},
 			Hands: []Hand{
 				{
-					betAmount: 25,
+					BetAmount: 25,
 				},
 			},
 		},

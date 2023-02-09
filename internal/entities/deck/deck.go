@@ -81,3 +81,7 @@ func (d *Deck) Print() string {
 func (d *Deck) Log(logger *zap.Logger) {
 	logger.Info("deck info", zap.String("deck", d.Print()))
 }
+
+func (d *Deck) IsFinished() bool {
+	return len(d.ActiveCards) == 0
+}
