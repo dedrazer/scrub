@@ -13,11 +13,6 @@ var (
 		"hit":   {"hit", "stand"},
 	}
 
-	//prompts = map[string]string{
-	//	"first": "hit/double down/stand? (h/d/s)",
-	//	"hit":   "hit/stand? (h/s)",
-	//}
-
 	first = "first"
 
 	stand  = "stand"
@@ -72,14 +67,6 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 							break
 						}
 					}
-
-					//fmt.Println(prompts[kind])
-					//_, err := fmt.Scanln(&input)
-					//if err != nil {
-					//	return errors.ErrFailedSubMethod("fmt.Scanln", err)
-					//}
-
-					//input = strings.ToLower(input)
 
 					action = strategy(players[i].Hands[j], dealerHand)
 					validInput := false
