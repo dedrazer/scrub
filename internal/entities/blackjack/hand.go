@@ -11,6 +11,7 @@ import (
 type Hand struct {
 	cards     []deck.Card
 	isSplit   bool
+	isDoubled bool
 	result    *string
 	BetAmount uint64
 }
@@ -106,4 +107,16 @@ func (h *Hand) CanDouble() bool {
 
 func (h *Hand) IsSoft() bool {
 	return len(h.Value()) > 1
+}
+
+func (h *Hand) Double() {
+	h.BetAmount *= 2
+	h.isDoubled = true
+}
+
+func (h *Hand) ResetDouble() {
+	if h.isDoubled {
+		h.BetAmount /= 2
+		h.isDoubled = false
+	}
 }

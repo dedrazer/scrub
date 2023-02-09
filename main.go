@@ -18,7 +18,7 @@ func main() {
 
 	//deck.Demo(logger)
 	//blackjack.Demo(logger)
-	err = blackjackanalytics.Simulate(1000000, 6)
+	err = blackjackanalytics.Simulate(100, 6)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}
