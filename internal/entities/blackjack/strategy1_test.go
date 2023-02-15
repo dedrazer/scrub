@@ -91,7 +91,7 @@ func TestStrategy1(t *testing.T) {
 			dealerHand := DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{
-						{Symbol: "10", Value: 10},
+						deck.TenOfHearts,
 						{Symbol: testCase.dealerSymbol, Value: deck.CardValues[testCase.dealerSymbol]},
 					},
 				},

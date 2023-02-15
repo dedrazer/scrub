@@ -21,11 +21,7 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			name:    "OK First Card",
 			indexes: []int{0},
 			expectedCards: []*Card{
-				{
-					Symbol: "Ace",
-					Value:  1,
-					Suit:   "Clubs",
-				},
+				&AceOfClubs,
 			},
 			expectedError: nil,
 		},
@@ -33,11 +29,7 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			name:    "OK Last Card",
 			indexes: []int{51},
 			expectedCards: []*Card{
-				{
-					Symbol: "King",
-					Value:  10,
-					Suit:   "Spades",
-				},
+				&KingOfSpades,
 			},
 			expectedError: nil,
 		},
@@ -50,16 +42,8 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 			name:    "OK Multiple Cards",
 			indexes: []int{0, 0},
 			expectedCards: []*Card{
-				{
-					Symbol: "Ace",
-					Value:  1,
-					Suit:   "Clubs",
-				},
-				{
-					Symbol: "2",
-					Value:  2,
-					Suit:   "Clubs",
-				},
+				&AceOfClubs,
+				&TwoOfClubs,
 			},
 			expectedError: nil,
 		},

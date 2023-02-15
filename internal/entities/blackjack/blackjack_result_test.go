@@ -34,16 +34,8 @@ func TestBlackjack_Result(t *testing.T) {
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
-								{
-									Value:  10,
-									Suit:   "Clubs",
-									Symbol: "King",
-								},
-								{
-									Value:  10,
-									Suit:   "Diamonds",
-									Symbol: "Queen",
-								},
+								deck.KingOfClubs,
+								deck.QueenOfDiamonds,
 							},
 							BetAmount: 50,
 						},
@@ -53,21 +45,9 @@ func TestBlackjack_Result(t *testing.T) {
 			inputDealerHand: DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "Queen",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Jack",
-						},
-						{
-							Value:  2,
-							Suit:   "Hearts",
-							Symbol: "2",
-						},
+						deck.QueenOfClubs,
+						deck.JackOfDiamonds,
+						deck.TwoOfHearts,
 					},
 				},
 			},
@@ -81,21 +61,9 @@ func TestBlackjack_Result(t *testing.T) {
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
-								{
-									Value:  10,
-									Suit:   "Clubs",
-									Symbol: "King",
-								},
-								{
-									Value:  10,
-									Suit:   "Diamonds",
-									Symbol: "Queen",
-								},
-								{
-									Value:  2,
-									Suit:   "Hearts",
-									Symbol: "2",
-								},
+								deck.KingOfClubs,
+								deck.QueenOfDiamonds,
+								deck.TwoOfHearts,
 							},
 							BetAmount: 50,
 						},
@@ -105,16 +73,8 @@ func TestBlackjack_Result(t *testing.T) {
 			inputDealerHand: DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "Queen",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Jack",
-						},
+						deck.QueenOfClubs,
+						deck.JackOfDiamonds,
 					},
 				},
 			},
@@ -128,26 +88,10 @@ func TestBlackjack_Result(t *testing.T) {
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
-								{
-									Value:  7,
-									Suit:   "Spades",
-									Symbol: "7",
-								},
-								{
-									Value:  4,
-									Suit:   "Hearts",
-									Symbol: "4",
-								},
-								{
-									Value:  3,
-									Suit:   "Spades",
-									Symbol: "3",
-								},
-								{
-									Value:  8,
-									Suit:   "Clubs",
-									Symbol: "8",
-								},
+								deck.SevenOfSpades,
+								deck.FourOfHearts,
+								deck.ThreeOfSpades,
+								deck.EightOfClubs,
 							},
 							BetAmount: 50,
 						},
@@ -156,21 +100,9 @@ func TestBlackjack_Result(t *testing.T) {
 			},
 			inputDealerHand: DealerHand{
 				Hand: Hand{cards: []deck.Card{
-					{
-						Value:  6,
-						Suit:   "Spades",
-						Symbol: "6",
-					},
-					{
-						Value:  8,
-						Suit:   "Diamonds",
-						Symbol: "8",
-					},
-					{
-						Value:  8,
-						Suit:   "Diamonds",
-						Symbol: "8",
-					},
+					deck.SixOfSpades,
+					deck.EightOfDiamonds,
+					deck.EightOfDiamonds,
 				},
 				},
 			},
@@ -184,16 +116,8 @@ func TestBlackjack_Result(t *testing.T) {
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
-								{
-									Value:  10,
-									Suit:   "Clubs",
-									Symbol: "King",
-								},
-								{
-									Value:  10,
-									Suit:   "Diamonds",
-									Symbol: "Queen",
-								},
+								deck.KingOfClubs,
+								deck.QueenOfDiamonds,
 							},
 							BetAmount: 50,
 						},
@@ -203,16 +127,8 @@ func TestBlackjack_Result(t *testing.T) {
 			inputDealerHand: DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "Queen",
-						},
-						{
-							Value:  10,
-							Suit:   "Diamonds",
-							Symbol: "Jack",
-						},
+						deck.QueenOfClubs,
+						deck.JackOfDiamonds,
 					},
 				},
 			},

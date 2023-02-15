@@ -21,16 +21,8 @@ func TestHand_CanSplit(t *testing.T) {
 			name: "Can",
 			input: Hand{
 				cards: []deck.Card{
-					{
-						Symbol: "10",
-						Suit:   "Hearts",
-						Value:  10,
-					},
-					{
-						Symbol: "10",
-						Suit:   "Diamonds",
-						Value:  10,
-					},
+					deck.TenOfHearts,
+					deck.TenOfDiamonds,
 				},
 			},
 			expected: true,
@@ -39,16 +31,8 @@ func TestHand_CanSplit(t *testing.T) {
 			name: "Cannot",
 			input: Hand{
 				cards: []deck.Card{
-					{
-						Symbol: "10",
-						Suit:   "Hearts",
-						Value:  10,
-					},
-					{
-						Symbol: "9",
-						Suit:   "Diamonds",
-						Value:  9,
-					},
+					deck.TenOfHearts,
+					deck.NineOfDiamonds,
 				},
 			},
 			expected: false,
@@ -75,16 +59,8 @@ func TestHand_IsSoft(t *testing.T) {
 			name: "Soft",
 			input: Hand{
 				cards: []deck.Card{
-					{
-						Symbol: "Ace",
-						Suit:   "Hearts",
-						Value:  1,
-					},
-					{
-						Symbol: "10",
-						Suit:   "Diamonds",
-						Value:  10,
-					},
+					deck.AceOfHearts,
+					deck.TenOfDiamonds,
 				},
 			},
 			expected: true,
@@ -93,16 +69,8 @@ func TestHand_IsSoft(t *testing.T) {
 			name: "Soft",
 			input: Hand{
 				cards: []deck.Card{
-					{
-						Symbol: "Ace",
-						Suit:   "Hearts",
-						Value:  1,
-					},
-					{
-						Symbol: "6",
-						Suit:   "Diamonds",
-						Value:  6,
-					},
+					deck.AceOfHearts,
+					deck.SixOfDiamonds,
 				},
 			},
 			expected: true,
@@ -111,16 +79,8 @@ func TestHand_IsSoft(t *testing.T) {
 			name: "Hard",
 			input: Hand{
 				cards: []deck.Card{
-					{
-						Symbol: "9",
-						Suit:   "Hearts",
-						Value:  9,
-					},
-					{
-						Symbol: "10",
-						Suit:   "Diamonds",
-						Value:  10,
-					},
+					deck.NineOfHearts,
+					deck.TenOfDiamonds,
 				},
 			},
 			expected: false,

@@ -13,10 +13,11 @@ import (
 
 func TestBlackjack_Play(t *testing.T) {
 	type testCase struct {
-		name            string
-		inputPlayers    []BlackJackPlayer
-		inputDealerHand DealerHand
-		expectedErr     error
+		name                  string
+		inputPlayers          []BlackJackPlayer
+		inputDealerHand       DealerHand
+		expectedErr           error
+		expectedNumberOfHands int
 	}
 
 	testLogger, err := zap.NewDevelopment()
@@ -36,17 +37,10 @@ func TestBlackjack_Play(t *testing.T) {
 					Hands: []Hand{
 						{
 							cards: []deck.Card{
-								{
-									Value:  10,
-									Suit:   "Clubs",
-									Symbol: "10",
-								},
-								{
-									Value:  10,
-									Suit:   "Diamonds",
-									Symbol: "10",
-								},
+								deck.TenOfClubs,
+								deck.TenOfDiamonds,
 							},
+							BetAmount: 50,
 						},
 					},
 				},
@@ -54,24 +48,39 @@ func TestBlackjack_Play(t *testing.T) {
 			inputDealerHand: DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{
+						deck.TenOfClubs,
+						deck.TwoOfDiamonds,
+						deck.TenOfClubs,
+					},
+				},
+			},
+			expectedNumberOfHands: 1,
+		},
+		{
+			name: "OK Split",
+			inputPlayers: []BlackJackPlayer{
+				{
+					Player: testPlayer,
+					Hands: []Hand{
 						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "10",
-						},
-						{
-							Value:  2,
-							Suit:   "Diamonds",
-							Symbol: "2",
-						},
-						{
-							Value:  10,
-							Suit:   "Clubs",
-							Symbol: "10",
+							cards: []deck.Card{
+								deck.NineOfClubs,
+								deck.NineOfDiamonds,
+							},
+							BetAmount: 10,
 						},
 					},
 				},
 			},
+			inputDealerHand: DealerHand{
+				Hand: Hand{
+					cards: []deck.Card{
+						deck.AceOfClubs,
+						deck.SixOfClubs,
+					},
+				},
+			},
+			expectedNumberOfHands: 2,
 		},
 	}
 
@@ -87,6 +96,7 @@ func TestBlackjack_Play(t *testing.T) {
 			}
 
 			require.NoError(t, err, "unexpected error")
+			require.Len(t, tc.inputPlayers[0].Hands, tc.expectedNumberOfHands, "number of hands")
 		})
 	}
 }
