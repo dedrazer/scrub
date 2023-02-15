@@ -41,6 +41,8 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 							players[i].Hands[j].cards = p.Hands[j].cards[:1]
 							players[i].Hands[j].isSplit = true
 							players[i].Hands = append(p.Hands, splitHand)
+
+							bj.SplitCounter++
 						} else {
 							return errors.ErrCannotSplit
 						}

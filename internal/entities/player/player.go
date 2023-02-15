@@ -8,11 +8,12 @@ import (
 )
 
 type Player struct {
-	Name    string
-	Credits uint64
-	Wins    uint64
-	Losses  uint64
-	Draws   uint64
+	Name            string
+	StartingCredits uint64
+	Credits         uint64
+	Wins            uint64
+	Losses          uint64
+	Draws           uint64
 }
 
 func (p *Player) Win(amount uint64) {
@@ -45,7 +46,11 @@ func (p *Player) WinRateString() string {
 }
 
 func (p *Player) LogStatistics(logger *zap.Logger) {
-	logger.Info("player statistics",
+	logger.Info("player credit statistics",
+		zap.Uint64("credits", p.Credits),
+		zap.String("percentage", fmt.Sprintf("%.2f%%", (float64(p.Credits)/float64(p.StartingCredits))*100)))
+
+	logger.Info("player match statistics",
 		zap.Uint64("won", p.Wins),
 		zap.Uint64("lost", p.Losses),
 		zap.String("win rate", p.WinRateString()),

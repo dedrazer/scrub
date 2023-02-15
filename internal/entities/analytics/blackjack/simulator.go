@@ -16,11 +16,14 @@ func Simulate(rounds, decks uint) error {
 		return err
 	}
 
+	startingCredits := uint64(1000000)
+
 	players := []blackjack.BlackJackPlayer{
 		{
 			Player: player.Player{
-				Name:    "Test Player",
-				Credits: 1000000,
+				Name:            "Test Player",
+				StartingCredits: startingCredits,
+				Credits:         startingCredits,
 			},
 			Hands: []blackjack.Hand{
 				{
@@ -49,9 +52,11 @@ func Simulate(rounds, decks uint) error {
 		}
 	}
 
-	logger.Info("simulation complete", zap.Uint("rounds", i), zap.Uint64("credits", players[0].Credits))
+	logger.Info("simulation complete", zap.Uint("rounds", i))
 
-	players[0].LogStatistics(logger)
+	for j := range players {
+		players[j].LogStatistics(logger)
+	}
 
 	totalDurationMs := time.Since(startTime).Milliseconds()
 	totalDuration := fmt.Sprintf("%dms", totalDurationMs)

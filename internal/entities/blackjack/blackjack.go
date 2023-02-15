@@ -7,6 +7,7 @@ import (
 type Blackjack struct {
 	deck          *deck.Deck
 	numberOfDecks uint
+	SplitCounter  uint64
 }
 
 func NewBlackjack(numberOfDecks uint) *Blackjack {
