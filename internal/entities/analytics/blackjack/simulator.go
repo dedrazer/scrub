@@ -51,7 +51,7 @@ func Simulate(rounds, decks uint) error {
 
 	logger.Info("simulation complete", zap.Uint("rounds", i), zap.Uint64("credits", players[0].Credits))
 
-	logger.Info("player statistics", zap.Uint64("won", players[0].Wins), zap.Uint64("lost", players[0].Losses), zap.String("win rate", players[0].WinRateString()))
+	players[0].LogStatistics(logger)
 
 	totalDurationMs := time.Since(startTime).Milliseconds()
 	totalDuration := fmt.Sprintf("%dms", totalDurationMs)

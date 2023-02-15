@@ -3,6 +3,8 @@ package player
 import (
 	"fmt"
 	"scrub/internal/errors"
+
+	"go.uber.org/zap"
 )
 
 type Player struct {
@@ -10,12 +12,17 @@ type Player struct {
 	Credits uint64
 	Wins    uint64
 	Losses  uint64
+	Draws   uint64
 }
 
 func (p *Player) Win(amount uint64) {
 	p.Credits += amount
 
-	p.Wins++
+	if amount > 0 {
+		p.Wins++
+	} else {
+		p.Draws++
+	}
 }
 
 func (p *Player) Lose(amount uint64) error {
@@ -35,4 +42,12 @@ func (p *Player) WinRate() float64 {
 
 func (p *Player) WinRateString() string {
 	return fmt.Sprintf("%.2f%%", p.WinRate()*100)
+}
+
+func (p *Player) LogStatistics(logger *zap.Logger) {
+	logger.Info("player statistics",
+		zap.Uint64("won", p.Wins),
+		zap.Uint64("lost", p.Losses),
+		zap.String("win rate", p.WinRateString()),
+		zap.Uint64("drawn", p.Draws))
 }
