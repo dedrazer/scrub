@@ -23,16 +23,16 @@ var (
 
 func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand, strategy func(playerHand Hand, dealerHand DealerHand) string) error {
 	if dealerHand.Blackjack() {
-		logger.Info("dealer has blackjack")
+		logger.Debug("dealer has blackjack")
 	} else {
-		logger.Info("playing round")
+		logger.Debug("playing round")
 		for i, p := range players {
 			for j := range p.Hands {
 				if p.Hands[j].CanSplit() {
 					action := strategy(p.Hands[j], dealerHand)
 
 					if action == split {
-						logger.Info("splitting hand", zap.Int("player", i+1), zap.Int("hand", j+1))
+						logger.Debug("splitting hand", zap.Int("player", i+1), zap.Int("hand", j+1))
 						if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[1].Symbol {
 							splitHand := Hand{
 								cards:   []deck.Card{p.Hands[j].cards[1]},
@@ -49,7 +49,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 			}
 
 			for j := range players[i].Hands {
-				logger.Info("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
+				logger.Debug("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
 
 				var action string
 				kind := hit
@@ -63,7 +63,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 						kind = first
 
 						if players[i].Hands[j].UpperValue() == 21 {
-							logger.Info("player has blackjack")
+							logger.Debug("player has blackjack")
 							break
 						}
 					}
@@ -116,7 +116,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 				}
 
 				if players[i].Hands[j].Bust() {
-					logger.Info("player bust")
+					logger.Debug("player bust")
 				}
 			}
 		}

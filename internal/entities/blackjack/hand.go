@@ -27,16 +27,16 @@ func (h *Hand) Print() string {
 
 func (h *Hand) Log(logger *zap.Logger, args ...string) {
 	if len(h.cards) == 0 {
-		logger.Info("hand", zap.String("cards", "empty"))
+		logger.Debug("hand", zap.String("cards", "empty"))
 		return
 	}
 
 	if len(args) == 0 {
-		logger.Info("hand", zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
+		logger.Debug("hand", zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
 		return
 	}
 
-	logger.Info(args[0], zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
+	logger.Debug(args[0], zap.String("cards", h.Print()), zap.String("value", h.PrintValue()))
 }
 
 func (h *Hand) PrintValue() string {
@@ -51,7 +51,7 @@ func (h *Hand) PrintValue() string {
 }
 
 func (h *Hand) LogValue(logger *zap.Logger) {
-	logger.Info("hand value", zap.String("amount", h.PrintValue()))
+	logger.Debug("hand value", zap.String("amount", h.PrintValue()))
 }
 
 func (h *Hand) Value() []uint {

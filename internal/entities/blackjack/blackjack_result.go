@@ -15,7 +15,7 @@ var (
 )
 
 func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
-	logger.Info("calculating results")
+	logger.Debug("calculating results")
 
 	err := bj.DrawDealerCards(logger, &dealerHand)
 	if err != nil {
@@ -24,7 +24,7 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, deal
 
 	dealerBust := false
 	if dealerHand.Bust() {
-		logger.Info("dealer bust")
+		logger.Debug("dealer bust")
 		dealerBust = true
 	}
 

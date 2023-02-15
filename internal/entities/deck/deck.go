@@ -51,7 +51,7 @@ func (c *Card) Print() string {
 }
 
 func (c *Card) Log(logger *zap.Logger) {
-	logger.Info("got card", zap.String("card", c.Print()))
+	logger.Debug("got card", zap.String("card", c.Print()))
 }
 
 type Deck struct {
@@ -79,7 +79,7 @@ func (d *Deck) Print() string {
 }
 
 func (d *Deck) Log(logger *zap.Logger) {
-	logger.Info("deck info", zap.String("deck", d.Print()))
+	logger.Debug("deck info", zap.String("deck", d.Print()))
 }
 
 func (d *Deck) IsFinished() bool {

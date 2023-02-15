@@ -7,7 +7,7 @@ type DealerHand struct {
 }
 
 func (dh *DealerHand) DealerLog(logger *zap.Logger) {
-	logger.Info("dealer hand", zap.String("card", dh.cards[1].Print()))
+	logger.Debug("dealer hand", zap.String("card", dh.cards[1].Print()))
 }
 
 func (dh *DealerHand) DealerResult(logger *zap.Logger) {

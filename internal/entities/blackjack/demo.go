@@ -7,7 +7,7 @@ import (
 )
 
 func Demo(logger *zap.Logger) {
-	logger.Info("initialising blackjack")
+	logger.Debug("initialising blackjack")
 	testBlackjack := NewBlackjack(6)
 
 	players := []BlackJackPlayer{
@@ -38,7 +38,7 @@ func Demo(logger *zap.Logger) {
 		},
 	}
 
-	logger.Info("dealing round", zap.Any("players", players))
+	logger.Debug("dealing round", zap.Any("players", players))
 	dealerHand, err := testBlackjack.DealRound(players)
 	if err != nil {
 		logger.Fatal("failed to deal round", zap.Error(err))

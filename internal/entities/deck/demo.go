@@ -5,10 +5,10 @@ import (
 )
 
 func Demo(logger *zap.Logger) {
-	logger.Info("initialising deck")
+	logger.Debug("initialising deck")
 	testDeck := NewDeck()
 
-	logger.Info("getting random card")
+	logger.Debug("getting random card")
 	card, err := testDeck.GetRandomCard()
 	if err != nil {
 		logger.Fatal("failed to get card", zap.Error(err))
@@ -17,19 +17,19 @@ func Demo(logger *zap.Logger) {
 	card.Log(logger)
 	testDeck.Log(logger)
 
-	logger.Info("taking first card")
+	logger.Debug("taking first card")
 	card, err = testDeck.TakeCardByIndex(0)
 
 	card.Log(logger)
 	testDeck.Log(logger)
 
-	logger.Info("taking random card")
+	logger.Debug("taking random card")
 	card, err = testDeck.TakeRandomCard()
 
 	card.Log(logger)
 	testDeck.Log(logger)
 
-	logger.Info("taking 10 random cards")
+	logger.Debug("taking 10 random cards")
 	for i := 0; i < 10; i++ {
 		card, err = testDeck.TakeRandomCard()
 		card.Log(logger)
@@ -37,14 +37,14 @@ func Demo(logger *zap.Logger) {
 
 	testDeck.Log(logger)
 
-	logger.Info("getting first card")
+	logger.Debug("getting first card")
 	card, _ = testDeck.GetCardByIndex(0)
 	card.Log(logger)
 
-	logger.Info("shuffling cards")
+	logger.Debug("shuffling cards")
 	testDeck.Shuffle()
 
-	logger.Info("getting first card")
+	logger.Debug("getting first card")
 	card, _ = testDeck.GetCardByIndex(0)
 	card.Log(logger)
 }
