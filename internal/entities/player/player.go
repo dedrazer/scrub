@@ -1,6 +1,9 @@
 package player
 
-import "scrub/internal/errors"
+import (
+	"fmt"
+	"scrub/internal/errors"
+)
 
 type Player struct {
 	Name    string
@@ -28,4 +31,8 @@ func (p *Player) Lose(amount uint64) error {
 
 func (p *Player) WinRate() float64 {
 	return float64(p.Wins) / float64(p.Wins+p.Losses)
+}
+
+func (p *Player) WinRateString() string {
+	return fmt.Sprintf("%.2f%%", p.WinRate()*100)
 }

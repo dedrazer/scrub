@@ -1,6 +1,7 @@
 package blackjackanalytics
 
 import (
+	"fmt"
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/player"
 	"scrub/internal/errors"
@@ -50,12 +51,13 @@ func Simulate(rounds, decks uint) error {
 
 	logger.Info("simulation complete", zap.Uint("rounds", i), zap.Uint64("credits", players[0].Credits))
 
-	logger.Info("player statistics", zap.Uint64("won", players[0].Wins), zap.Uint64("lost", players[0].Losses), zap.Float64("win rate", players[0].WinRate()))
+	logger.Info("player statistics", zap.Uint64("won", players[0].Wins), zap.Uint64("lost", players[0].Losses), zap.String("win rate", players[0].WinRateString()))
 
-	durationMs := time.Since(startTime).Milliseconds()
-	averageRoundDurationMicroseconds := (float64(durationMs) / float64(rounds)) * 1000
+	totalDurationMs := time.Since(startTime).Milliseconds()
+	totalDuration := fmt.Sprintf("%dms", totalDurationMs)
+	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(rounds))*1000)
 	logger.Info("runtime statistics",
-		zap.Int64("duration(ms)", durationMs),
-		zap.Float64("average round duration(μs)", averageRoundDurationMicroseconds))
+		zap.String("duration", totalDuration),
+		zap.String("average round duration", averageRoundDuration))
 	return nil
 }
