@@ -60,8 +60,10 @@ func Simulate(logger *zap.Logger, rounds, decks uint) error {
 	totalDurationMs := time.Since(startTime).Milliseconds()
 	totalDuration := fmt.Sprintf("%dms", totalDurationMs)
 	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(rounds))*1000)
+	roundsPerSecond := int64(float64(int64(rounds)*1000) / float64(totalDurationMs))
 	logger.Info("runtime statistics",
 		zap.String("duration", totalDuration),
+		zap.Int64("rounds per second", roundsPerSecond),
 		zap.String("average round duration", averageRoundDuration))
 	return nil
 }
