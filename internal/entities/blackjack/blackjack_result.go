@@ -14,7 +14,7 @@ var (
 	blackjack = "blackjack"
 )
 
-func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand) error {
+func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand) error {
 	logger.Debug("calculating results")
 
 	err := bj.DrawDealerCards(logger, &dealerHand)
@@ -31,31 +31,38 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackJackPlayer, deal
 	for i, p := range players {
 		for j, h := range p.Hands {
 			if h.Bust() {
+				bj.PlayerBust++
+				bj.PlayerLosses++
 				players[i].Hands[j].result = &loss
 				continue
 			}
 
 			if h.Blackjack() && !dealerHand.Blackjack() {
+				bj.PlayerBlackjackCount++
 				players[i].Hands[j].result = &blackjack
 				continue
 			}
 
 			if dealerBust {
+				bj.DealerBust++
 				players[i].Hands[j].result = &win
 				continue
 			}
 
 			if h.UpperValue() < dealerHand.UpperValue() {
+				bj.PlayerLosses++
 				players[i].Hands[j].result = &loss
 				continue
 			}
 
 			if h.UpperValue() > dealerHand.UpperValue() {
+				bj.PlayerWins++
 				players[i].Hands[j].result = &win
 				continue
 			}
 
 			if h.UpperValue() == dealerHand.UpperValue() {
+				bj.Pushes++
 				players[i].Hands[j].result = &push
 				continue
 			}

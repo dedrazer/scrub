@@ -14,7 +14,7 @@ import (
 func TestBlackjack_Play(t *testing.T) {
 	type testCase struct {
 		name                  string
-		inputPlayers          []BlackJackPlayer
+		inputPlayers          []BlackjackPlayer
 		inputDealerHand       DealerHand
 		expectedErr           error
 		expectedNumberOfHands int
@@ -31,7 +31,7 @@ func TestBlackjack_Play(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "OK Dealer Bust",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{
@@ -58,7 +58,7 @@ func TestBlackjack_Play(t *testing.T) {
 		},
 		{
 			name: "OK Split",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{

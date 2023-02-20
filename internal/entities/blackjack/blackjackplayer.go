@@ -1,21 +1,22 @@
 package blackjack
 
 import (
+	"errors"
 	"scrub/internal/entities/player"
-	"scrub/internal/errors"
+	internalErrors "scrub/internal/errors"
 
 	"go.uber.org/zap"
 )
 
-type BlackJackPlayer struct {
+type BlackjackPlayer struct {
 	player.Player
 	Hands []Hand
 }
 
-func (bjp *BlackJackPlayer) PrintResult(logger *zap.Logger) error {
+func (bjp *BlackjackPlayer) PrintResult(logger *zap.Logger) error {
 	for i, h := range bjp.Hands {
 		if h.result == nil {
-			return errors.ErrUnexpectedNil
+			return internalErrors.ErrUnexpectedNil
 		}
 		logger.Debug("player result",
 			zap.String("player", bjp.Player.Name),
@@ -28,11 +29,34 @@ func (bjp *BlackJackPlayer) PrintResult(logger *zap.Logger) error {
 	return nil
 }
 
-func PrintAllResults(logger *zap.Logger, blackjackPlayers []BlackJackPlayer) error {
+func PrintAllResults(logger *zap.Logger, blackjackPlayers []BlackjackPlayer) error {
 	for i := range blackjackPlayers {
 		if err := blackjackPlayers[i].PrintResult(logger); err != nil {
 			return err
 		}
 	}
+	return nil
+}
+
+func (bjp *BlackjackPlayer) ResetHands() error {
+	splitCount := 0
+
+	for i := range bjp.Hands {
+		if bjp.Hands[i].isSplit {
+			splitCount++
+			bjp.Hands[i].isSplit = false
+		}
+
+		bjp.Hands[i].ResetDouble()
+	}
+
+	if splitCount%2 != 0 {
+		return errors.New("split count is odd")
+	}
+
+	if splitCount > 0 {
+		bjp.Hands = bjp.Hands[splitCount/2:]
+	}
+
 	return nil
 }

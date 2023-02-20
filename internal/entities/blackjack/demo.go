@@ -10,7 +10,7 @@ func Demo(logger *zap.Logger) {
 	logger.Debug("initialising blackjack")
 	testBlackjack := NewBlackjack(6)
 
-	players := []BlackJackPlayer{
+	players := []BlackjackPlayer{
 		{
 			Player: player.Player{
 				Name:    "Martin",

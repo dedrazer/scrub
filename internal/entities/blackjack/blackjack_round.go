@@ -5,7 +5,7 @@ import (
 	"scrub/internal/errors"
 )
 
-func (bj *Blackjack) DealRound(players []BlackJackPlayer) (dealerHand DealerHand, err error) {
+func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand, err error) {
 	for i := range players {
 		for j := range players[i].Hands {
 			if len(players[i].Hands[j].cards) > 0 {
@@ -47,7 +47,7 @@ func (bj *Blackjack) DealRound(players []BlackJackPlayer) (dealerHand DealerHand
 	return dealerHand, err
 }
 
-func (bj *Blackjack) DealRoundOfCards(players []BlackJackPlayer) error {
+func (bj *Blackjack) DealRoundOfCards(players []BlackjackPlayer) error {
 	for i := range players {
 		if len(players[i].Hands) == 0 {
 			players[i].Hands = make([]Hand, 1)

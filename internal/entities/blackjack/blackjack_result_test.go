@@ -14,7 +14,7 @@ import (
 func TestBlackjack_Result(t *testing.T) {
 	type testCase struct {
 		name                  string
-		inputPlayers          []BlackJackPlayer
+		inputPlayers          []BlackjackPlayer
 		inputDealerHand       DealerHand
 		expectedResultCredits []uint64
 		expectedErr           error
@@ -28,7 +28,7 @@ func TestBlackjack_Result(t *testing.T) {
 	testCases := []testCase{
 		{
 			name: "OK Dealer Bust",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{
@@ -55,7 +55,7 @@ func TestBlackjack_Result(t *testing.T) {
 		},
 		{
 			name: "OK Player Bust",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{
@@ -82,7 +82,7 @@ func TestBlackjack_Result(t *testing.T) {
 		},
 		{
 			name: "OK Player & Dealer Bust",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{
@@ -110,7 +110,7 @@ func TestBlackjack_Result(t *testing.T) {
 		},
 		{
 			name: "OK Push",
-			inputPlayers: []BlackJackPlayer{
+			inputPlayers: []BlackjackPlayer{
 				{
 					Player: testPlayer,
 					Hands: []Hand{

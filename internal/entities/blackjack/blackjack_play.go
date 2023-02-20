@@ -21,7 +21,7 @@ var (
 	double = "double"
 )
 
-func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerHand DealerHand, strategy func(playerHand Hand, dealerHand DealerHand) string) error {
+func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand, strategy func(playerHand Hand, dealerHand DealerHand) string) error {
 	if dealerHand.Blackjack() {
 		logger.Debug("dealer has blackjack")
 	} else {
@@ -42,7 +42,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 							players[i].Hands[j].isSplit = true
 							players[i].Hands = append(p.Hands, splitHand)
 
-							bj.SplitCounter++
+							bj.SplitCount++
 						} else {
 							return errors.ErrCannotSplit
 						}
@@ -133,8 +133,8 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackJackPlayer, dealerH
 	}
 
 	for i := range players {
-		for j := range players[i].Hands {
-			players[i].Hands[j].ResetDouble()
+		if err := players[i].ResetHands(); err != nil {
+			return errors.ErrFailedSubMethod("ResetHands", err)
 		}
 	}
 
