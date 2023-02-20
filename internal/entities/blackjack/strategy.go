@@ -1,6 +1,6 @@
 package blackjack
 
-func Strategy1(playerHand Hand, dealerHand DealerHand) string {
+func Strategy(playerHand Hand, dealerHand DealerHand) string {
 	if playerHand.CanSplit() {
 		switch playerHand.cards[0].Symbol {
 		case "A", "8":

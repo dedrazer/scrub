@@ -1,2 +1,4 @@
 # scrub
 
+## todo
+- betting strategy

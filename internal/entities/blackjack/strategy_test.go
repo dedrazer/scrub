@@ -101,7 +101,7 @@ func TestStrategy1(t *testing.T) {
 				playerHand.cards = append(playerHand.cards, deck.Card{Symbol: symbol, Value: deck.CardValues[symbol]})
 			}
 
-			actual := Strategy1(playerHand, dealerHand)
+			actual := Strategy(playerHand, dealerHand)
 			require.Equal(t, testCase.expected, actual)
 		})
 	}

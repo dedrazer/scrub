@@ -43,7 +43,7 @@ func Simulate(logger *zap.Logger, rounds, decks uint) error {
 			return errors.ErrFailedSubMethod("DealRound", err)
 		}
 
-		err = bj.Play(logger, players, dealerHand, blackjack.Strategy1)
+		err = bj.Play(logger, players, dealerHand, blackjack.Strategy)
 		if err != nil {
 			return errors.ErrFailedSubMethod("Play", err)
 		}
