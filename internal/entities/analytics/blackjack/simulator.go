@@ -10,11 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func Simulate(rounds, decks uint) error {
-	logger, err := zap.NewProduction()
-	if err != nil {
-		return err
-	}
+func Simulate(logger *zap.Logger, rounds, decks uint) error {
+	logger.Info("starting simulation", zap.Uint("rounds", rounds), zap.Uint("decks", decks))
 
 	startingCredits := uint64(1000000)
 

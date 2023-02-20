@@ -11,6 +11,10 @@ func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand
 			if len(players[i].Hands[j].cards) > 0 {
 				players[i].Hands[j].cards = []deck.Card{}
 			}
+
+			if players[i].Hands[j].BetAmount == 0 {
+				continue
+			}
 		}
 	}
 

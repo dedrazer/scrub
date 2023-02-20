@@ -39,12 +39,14 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 
 			if h.Blackjack() && !dealerHand.Blackjack() {
 				bj.PlayerBlackjackCount++
+				bj.PlayerWins++
 				players[i].Hands[j].result = &blackjack
 				continue
 			}
 
 			if dealerBust {
 				bj.DealerBust++
+				bj.PlayerWins++
 				players[i].Hands[j].result = &win
 				continue
 			}

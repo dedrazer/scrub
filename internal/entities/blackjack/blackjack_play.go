@@ -35,8 +35,9 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 						logger.Debug("splitting hand", zap.Int("player", i+1), zap.Int("hand", j+1))
 						if p.Hands[j].cards[0].Symbol == p.Hands[j].cards[1].Symbol {
 							splitHand := Hand{
-								cards:   []deck.Card{p.Hands[j].cards[1]},
-								isSplit: true,
+								cards:     []deck.Card{p.Hands[j].cards[1]},
+								isSplit:   true,
+								BetAmount: p.Hands[j].BetAmount,
 							}
 							players[i].Hands[j].cards = p.Hands[j].cards[:1]
 							players[i].Hands[j].isSplit = true
