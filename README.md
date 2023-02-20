@@ -1,5 +1,2 @@
 # scrub
 
-## todo
-- analytics
-- insurance?
