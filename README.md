@@ -1,4 +1,4 @@
 # scrub
 
 ## todo
-- betting strategy
+- stern method
