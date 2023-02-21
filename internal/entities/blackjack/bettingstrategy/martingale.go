@@ -10,6 +10,7 @@ import (
 
 var (
 	lossStreak int
+	round      int
 )
 
 func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
@@ -33,10 +34,12 @@ func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCred
 			}
 
 			if players[i].Hands[j].BetAmount > players[i].Credits {
-				logger.Info("player ran out of credits", zap.Int("loss streak", lossStreak))
 				players[i].Hands[j].BetAmount = players[i].Credits
+				logger.Info("player all in", zap.Int("loss streak", lossStreak), zap.Uint64("next bet", players[i].Hands[j].BetAmount), zap.Int("round", round))
 			}
 		}
+
+		round++
 	}
 
 	return nil

@@ -10,33 +10,48 @@ import (
 	"go.uber.org/zap"
 )
 
-func Simulate(logger *zap.Logger, rounds, decks uint, startingCredits uint64, bettingStrategy func(*zap.Logger, []blackjack.BlackjackPlayer, uint64) error, oneCreditAmount uint64) error {
-	logger.Info("starting simulation", zap.Uint("rounds", rounds), zap.Uint("decks", decks))
+type SimulationConfig struct {
+	Rounds          uint
+	Decks           uint
+	StartingCredits uint64
+	OneCreditAmount uint64
+	RebuyCount      int
+}
+
+func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStrategy func(*zap.Logger, []blackjack.BlackjackPlayer, uint64) error) error {
+	logger.Info("starting simulation", zap.Uint("rounds", simulationConfig.Rounds), zap.Uint("decks", simulationConfig.Decks))
 
 	players := []blackjack.BlackjackPlayer{
 		{
 			Player: player.Player{
 				Name:            "Test Player",
-				StartingCredits: startingCredits,
-				Credits:         startingCredits,
+				StartingCredits: simulationConfig.StartingCredits,
+				Credits:         simulationConfig.StartingCredits,
 			},
 			Hands: []blackjack.Hand{
 				{
-					BetAmount: oneCreditAmount,
+					BetAmount: simulationConfig.OneCreditAmount,
 				},
 			},
 		},
 	}
 
-	bj := blackjack.NewBlackjack(decks)
+	bj := blackjack.NewBlackjack(simulationConfig.Decks)
 
 	startTime := time.Now().UTC()
+	startingRebuyCount := simulationConfig.RebuyCount
 
 	var i uint = 0
-	for i < rounds && players[0].Credits > 0 {
+	for i < simulationConfig.Rounds && (players[0].Credits > 0 || simulationConfig.RebuyCount > 0) {
 		i++
 
-		err := bettingStrategy(logger, players, oneCreditAmount)
+		if players[0].Credits == 0 {
+			logger.Info("player rebuy", zap.Int("rebuys remaining", simulationConfig.RebuyCount))
+			players[0].Credits = simulationConfig.StartingCredits
+			simulationConfig.RebuyCount--
+		}
+
+		err := bettingStrategy(logger, players, simulationConfig.OneCreditAmount)
 		if err != nil {
 			return errors.ErrFailedSubMethod("bettingStrategy", err)
 		}
@@ -52,7 +67,7 @@ func Simulate(logger *zap.Logger, rounds, decks uint, startingCredits uint64, be
 		}
 	}
 
-	logger.Info("simulation complete", zap.Uint("rounds", i))
+	logger.Info("simulation complete", zap.Uint("rounds", i), zap.Int("rebuys", startingRebuyCount-simulationConfig.RebuyCount))
 
 	for j := range players {
 		players[j].LogStatistics(logger)
@@ -62,8 +77,8 @@ func Simulate(logger *zap.Logger, rounds, decks uint, startingCredits uint64, be
 
 	totalDurationMs := time.Since(startTime).Milliseconds()
 	totalDuration := fmt.Sprintf("%dms", totalDurationMs)
-	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(rounds))*1000)
-	roundsPerSecond := int64(float64(int64(rounds)*1000) / float64(totalDurationMs))
+	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(simulationConfig.Rounds))*1000)
+	roundsPerSecond := int64(float64(int64(simulationConfig.Rounds)*1000) / float64(totalDurationMs))
 	logger.Info("runtime statistics",
 		zap.String("duration", totalDuration),
 		zap.Int64("rounds per second", roundsPerSecond),
