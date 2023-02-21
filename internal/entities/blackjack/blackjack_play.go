@@ -21,7 +21,7 @@ var (
 	double = "double"
 )
 
-func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand, strategy func(playerHand Hand, dealerHand DealerHand) string) error {
+func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand, strategy func(playerHand Hand, dealerHand DealerHand, playerCredits uint64) string) error {
 	if dealerHand.Blackjack() {
 		logger.Debug("dealer has blackjack")
 	} else {
@@ -29,7 +29,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 		for i, p := range players {
 			for j := range p.Hands {
 				if p.Hands[j].CanSplit() {
-					action := strategy(p.Hands[j], dealerHand)
+					action := strategy(p.Hands[j], dealerHand, players[i].Credits)
 
 					if action == split {
 						logger.Debug("splitting hand", zap.Int("player", i+1), zap.Int("hand", j+1))
@@ -71,7 +71,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 						}
 					}
 
-					action = strategy(players[i].Hands[j], dealerHand)
+					action = strategy(players[i].Hands[j], dealerHand, players[i].Credits)
 					validInput := false
 					for _, v := range acceptedInputs[kind] {
 						if action == v {

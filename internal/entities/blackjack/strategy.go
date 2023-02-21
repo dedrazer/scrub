@@ -1,6 +1,6 @@
 package blackjack
 
-func Strategy(playerHand Hand, dealerHand DealerHand) string {
+func Strategy(playerHand Hand, dealerHand DealerHand, playerCredits uint64) string {
 	if playerHand.CanSplit() {
 		switch playerHand.cards[0].Symbol {
 		case "A", "8":
@@ -37,15 +37,15 @@ func Strategy(playerHand Hand, dealerHand DealerHand) string {
 			if dealerHand.UpCardValue() < 3 || dealerHand.UpCardValue() > 6 {
 				return hit
 			}
-			return DoubleIfPossible(playerHand)
+			return DoubleIfPossible(playerHand, playerCredits)
 		case 16, 15:
 			if dealerHand.UpCardValue() < 4 || dealerHand.UpCardValue() > 6 {
 				return hit
 			}
-			return DoubleIfPossible(playerHand)
+			return DoubleIfPossible(playerHand, playerCredits)
 		case 14, 13:
 			if dealerHand.UpCardValue() < 5 || dealerHand.UpCardValue() > 6 {
-				return DoubleIfPossible(playerHand)
+				return DoubleIfPossible(playerHand, playerCredits)
 			}
 		}
 	}
@@ -66,21 +66,21 @@ func Strategy(playerHand Hand, dealerHand DealerHand) string {
 		}
 		return stand
 	case 11:
-		return DoubleIfPossible(playerHand)
+		return DoubleIfPossible(playerHand, playerCredits)
 	case 10:
-		return DoubleIfPossible(playerHand)
+		return DoubleIfPossible(playerHand, playerCredits)
 	case 9:
 		if dealerHand.UpCardValue() < 3 || dealerHand.UpCardValue() > 6 {
 			return hit
 		}
-		return DoubleIfPossible(playerHand)
+		return DoubleIfPossible(playerHand, playerCredits)
 	default:
 		return hit
 	}
 }
 
-func DoubleIfPossible(h Hand) string {
-	if h.CanDouble() {
+func DoubleIfPossible(h Hand, playerCredits uint64) string {
+	if h.CanDouble(playerCredits) {
 		return double
 	}
 	return hit

@@ -101,8 +101,8 @@ func (h *Hand) CanSplit() bool {
 	return !h.isSplit && len(h.cards) == 2 && h.cards[0].Symbol == h.cards[1].Symbol
 }
 
-func (h *Hand) CanDouble() bool {
-	return len(h.cards) == 2 && !h.isSplit
+func (h *Hand) CanDouble(playerCredits uint64) bool {
+	return len(h.cards) == 2 && !h.isSplit && h.BetAmount*2 <= playerCredits
 }
 
 func (h *Hand) IsSoft() bool {

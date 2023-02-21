@@ -1,7 +1,7 @@
 package utils
 
 var (
-	Win       = "Win"
+	Win       = "win"
 	Loss      = "loss"
 	Push      = "push"
 	Blackjack = "blackjack"
