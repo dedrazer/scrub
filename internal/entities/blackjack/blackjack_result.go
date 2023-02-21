@@ -2,16 +2,10 @@ package blackjack
 
 import (
 	"errors"
+	"scrub/internal/entities/blackjack/utils"
 	internalErrors "scrub/internal/errors"
 
 	"go.uber.org/zap"
-)
-
-var (
-	win       = "win"
-	loss      = "loss"
-	push      = "push"
-	blackjack = "blackjack"
 )
 
 func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand) error {
@@ -33,39 +27,39 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 			if h.Bust() {
 				bj.PlayerBust++
 				bj.PlayerLosses++
-				players[i].Hands[j].result = &loss
+				players[i].Hands[j].Result = &utils.Loss
 				continue
 			}
 
 			if h.Blackjack() && !dealerHand.Blackjack() {
 				bj.PlayerBlackjackCount++
 				bj.PlayerWins++
-				players[i].Hands[j].result = &blackjack
+				players[i].Hands[j].Result = &utils.Blackjack
 				continue
 			}
 
 			if dealerBust {
 				bj.DealerBust++
 				bj.PlayerWins++
-				players[i].Hands[j].result = &win
+				players[i].Hands[j].Result = &utils.Win
 				continue
 			}
 
 			if h.UpperValue() < dealerHand.UpperValue() {
 				bj.PlayerLosses++
-				players[i].Hands[j].result = &loss
+				players[i].Hands[j].Result = &utils.Loss
 				continue
 			}
 
 			if h.UpperValue() > dealerHand.UpperValue() {
 				bj.PlayerWins++
-				players[i].Hands[j].result = &win
+				players[i].Hands[j].Result = &utils.Win
 				continue
 			}
 
 			if h.UpperValue() == dealerHand.UpperValue() {
 				bj.Pushes++
-				players[i].Hands[j].result = &push
+				players[i].Hands[j].Result = &utils.Push
 				continue
 			}
 
@@ -75,22 +69,22 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 
 	for i, p := range players {
 		for _, h := range p.Hands {
-			if h.result == nil {
+			if h.Result == nil {
 				return errors.New("unexpected nil result")
 			}
-			res := *h.result
+			res := *h.Result
 
 			switch res {
-			case win:
+			case utils.Win:
 				players[i].Win(h.BetAmount)
-			case loss:
+			case utils.Loss:
 				err = players[i].Lose(h.BetAmount)
 				if err != nil {
 					return internalErrors.ErrFailedSubMethod("Lose", err)
 				}
-			case push:
+			case utils.Push:
 				players[i].Win(0)
-			case blackjack:
+			case utils.Blackjack:
 				players[i].Win(uint64(float64(h.BetAmount) * 1.5))
 			}
 		}

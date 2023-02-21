@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	blackjackanalytics "scrub/internal/entities/analytics/blackjack"
+	"scrub/internal/entities/blackjack/bettingstrategy"
 
 	"go.uber.org/zap"
 )
@@ -19,7 +20,7 @@ func main() {
 
 	//deck.Demo(logger)
 	//blackjack.Demo(logger)
-	err = blackjackanalytics.Simulate(logger, 10000, 6)
+	err = blackjackanalytics.Simulate(logger, 10000, 6, bettingstrategy.Martingale, 50)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}

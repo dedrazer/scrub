@@ -12,7 +12,7 @@ type Hand struct {
 	cards     []deck.Card
 	isSplit   bool
 	isDoubled bool
-	result    *string
+	Result    *string
 	BetAmount uint64
 }
 

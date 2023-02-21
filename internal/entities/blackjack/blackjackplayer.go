@@ -15,14 +15,14 @@ type BlackjackPlayer struct {
 
 func (bjp *BlackjackPlayer) PrintResult(logger *zap.Logger) error {
 	for i, h := range bjp.Hands {
-		if h.result == nil {
+		if h.Result == nil {
 			return internalErrors.ErrUnexpectedNil
 		}
 		logger.Debug("player result",
 			zap.String("player", bjp.Player.Name),
 			zap.Int("hand", i+1),
 			zap.Uint("hand value", h.UpperValue()),
-			zap.String("result", *h.result),
+			zap.String("result", *h.Result),
 			zap.Uint64("credits", bjp.Player.Credits))
 	}
 

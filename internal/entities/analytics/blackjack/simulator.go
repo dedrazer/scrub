@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func Simulate(logger *zap.Logger, rounds, decks uint) error {
+func Simulate(logger *zap.Logger, rounds, decks uint, bettingStrategy func([]blackjack.BlackjackPlayer, uint64) error, oneCreditAmount uint64) error {
 	logger.Info("starting simulation", zap.Uint("rounds", rounds), zap.Uint("decks", decks))
 
 	startingCredits := uint64(1000000)
@@ -24,7 +24,7 @@ func Simulate(logger *zap.Logger, rounds, decks uint) error {
 			},
 			Hands: []blackjack.Hand{
 				{
-					BetAmount: 10,
+					BetAmount: oneCreditAmount,
 				},
 			},
 		},
@@ -37,6 +37,11 @@ func Simulate(logger *zap.Logger, rounds, decks uint) error {
 	var i uint = 0
 	for i < rounds && players[0].Credits > 0 {
 		i++
+
+		err := bettingStrategy(players, oneCreditAmount)
+		if err != nil {
+			return errors.ErrFailedSubMethod("bettingStrategy", err)
+		}
 
 		dealerHand, err := bj.DealRound(players)
 		if err != nil {
