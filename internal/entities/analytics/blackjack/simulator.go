@@ -10,10 +10,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func Simulate(logger *zap.Logger, rounds, decks uint, bettingStrategy func(*zap.Logger, []blackjack.BlackjackPlayer, uint64) error, oneCreditAmount uint64) error {
+func Simulate(logger *zap.Logger, rounds, decks uint, startingCredits uint64, bettingStrategy func(*zap.Logger, []blackjack.BlackjackPlayer, uint64) error, oneCreditAmount uint64) error {
 	logger.Info("starting simulation", zap.Uint("rounds", rounds), zap.Uint("decks", decks))
-
-	startingCredits := uint64(1000000)
 
 	players := []blackjack.BlackjackPlayer{
 		{
