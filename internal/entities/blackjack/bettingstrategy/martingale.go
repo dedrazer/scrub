@@ -35,7 +35,7 @@ func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCred
 
 			if players[i].Hands[j].BetAmount > players[i].Credits {
 				players[i].Hands[j].BetAmount = players[i].Credits
-				logger.Info("player all in", zap.Int("loss streak", lossStreak), zap.Uint64("next bet", players[i].Hands[j].BetAmount), zap.Int("round", round))
+				logger.Debug("player all in", zap.Int("loss streak", lossStreak), zap.Uint64("next bet", players[i].Hands[j].BetAmount), zap.Int("round", round))
 			}
 		}
 

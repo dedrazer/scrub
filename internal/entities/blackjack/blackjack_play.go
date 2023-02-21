@@ -28,7 +28,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 		logger.Debug("playing round")
 		for i, p := range players {
 			for j := range p.Hands {
-				if p.Hands[j].CanSplit() {
+				if players[i].Hands[j].CanSplit(players[i].Credits) {
 					action := strategy(p.Hands[j], dealerHand, players[i].Credits)
 
 					if action == split {

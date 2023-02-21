@@ -1,7 +1,7 @@
 package blackjack
 
 func Strategy(playerHand Hand, dealerHand DealerHand, playerCredits uint64) string {
-	if playerHand.CanSplit() {
+	if playerHand.CanSplit(playerCredits) {
 		switch playerHand.cards[0].Symbol {
 		case "A", "8":
 			return split

@@ -21,11 +21,11 @@ func main() {
 	//deck.Demo(logger)
 	//blackjack.Demo(logger)
 	simulationConfig := blackjackanalytics.SimulationConfig{
-		Rounds:          1000,
+		Rounds:          1000000,
 		Decks:           6,
-		StartingCredits: 2000,
+		StartingCredits: 3000,
 		OneCreditAmount: 50,
-		RebuyCount:      20,
+		RebuyCount:      1000,
 	}
 
 	err = blackjackanalytics.Simulate(logger, simulationConfig, bettingstrategy.Martingale)
