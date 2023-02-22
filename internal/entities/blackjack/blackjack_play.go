@@ -28,6 +28,10 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 		logger.Debug("playing round")
 		for i, p := range players {
 			for j := range p.Hands {
+				if players[i].Hands[j].BetAmount > players[i].Credits {
+					return errors.ErrInsufficientCredits
+				}
+
 				logger.Debug("bet info", zap.Uint64("amount", players[i].Hands[j].BetAmount))
 
 				if players[i].Hands[j].CanSplit(players[i].Credits) {

@@ -61,6 +61,10 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 			creditAtRound = append(creditAtRound, roundsSinceLastCredit)
 		}
 
+		if players[0].Hands[0].BetAmount > players[0].Credits {
+			players[0].Hands[0].BetAmount = players[0].Credits
+		}
+
 		profitPercentage := float64(players[0].Credits) / float64(simulationConfig.StartingCredits)
 		if profitPercentage > highestProfitPercentage {
 			highestProfitPercentage = profitPercentage
