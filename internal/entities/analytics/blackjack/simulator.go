@@ -61,10 +61,6 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 			creditAtRound = append(creditAtRound, roundsSinceLastCredit)
 		}
 
-		if players[0].Hands[0].BetAmount > players[0].Credits {
-			players[0].Hands[0].BetAmount = players[0].Credits
-		}
-
 		profitPercentage := float64(players[0].Credits) / float64(simulationConfig.StartingCredits)
 		if profitPercentage > highestProfitPercentage {
 			highestProfitPercentage = profitPercentage
@@ -73,6 +69,10 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 		err := bettingStrategy(logger, players, simulationConfig.OneCreditAmount)
 		if err != nil {
 			return errors.ErrFailedSubMethod("bettingStrategy", err)
+		}
+
+		if players[0].Hands[0].BetAmount > players[0].Credits {
+			players[0].Hands[0].BetAmount = players[0].Credits
 		}
 
 		dealerHand, err := bj.DealRound(players)
@@ -97,11 +97,18 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 	bj.LogStatistics(logger)
 
 	totalDurationMs := time.Since(startTime).Milliseconds()
-	totalDuration := fmt.Sprintf("%dms", totalDurationMs)
+	var totalDurationTextual string
+
+	if totalDurationMs > 10000 {
+		totalDurationTextual = fmt.Sprintf("%ds", totalDurationMs/1000)
+	} else {
+		totalDurationTextual = fmt.Sprintf("%dms", totalDurationMs)
+	}
+
 	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(simulationConfig.Rounds))*1000)
 	roundsPerSecond := int64(float64(int64(simulationConfig.Rounds)*1000) / float64(totalDurationMs))
 	logger.Info("runtime statistics",
-		zap.String("duration", totalDuration),
+		zap.String("duration", totalDurationTextual),
 		zap.Int64("rounds per second", roundsPerSecond),
 		zap.String("average round duration", averageRoundDuration))
 
