@@ -1,6 +1,6 @@
 # scrub
 
 ## todo
-- stern method
+- bank
 - fix SimulationResults when there are no rebuys
 - auto stop when results are stable
