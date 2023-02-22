@@ -67,25 +67,40 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 		}
 	}
 
+	splitWinCount := 0
+
 	for i, p := range players {
-		for _, h := range p.Hands {
+		for j, h := range p.Hands {
 			if h.Result == nil {
 				return errors.New("unexpected nil result")
 			}
+
 			res := *h.Result
 
 			switch res {
 			case utils.Win:
+				if h.isSplit {
+					splitWinCount++
+				}
+
 				players[i].Win(h.BetAmount)
 			case utils.Loss:
 				err = players[i].Lose(h.BetAmount)
 				if err != nil {
 					return internalErrors.ErrFailedSubMethod("Lose", err)
 				}
+				if players[i].Credits == 0 {
+					players[i].Hands[j].Result = &utils.Bankrupt
+				}
 			case utils.Push:
 				players[i].Win(0)
 			case utils.Blackjack:
 				players[i].Win(uint64(float64(h.BetAmount) * 1.5))
+			}
+
+			if h.isSplit {
+				splitRes := utils.SplitWon[splitWinCount]
+				players[i].Hands[j].Result = &splitRes
 			}
 		}
 	}

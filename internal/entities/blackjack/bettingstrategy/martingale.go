@@ -21,21 +21,22 @@ func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCred
 			}
 
 			switch *players[i].Hands[j].Result {
-			case utils.Loss:
-				players[i].Hands[j].BetAmount *= 2
-				lossStreak++
-			case utils.Win, utils.Blackjack:
+			case utils.Loss, utils.SplitWon0:
+				if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
+					players[i].Hands[j].BetAmount *= 2
+					lossStreak++
+					continue
+				}
+
+				players[i].Hands[j].BetAmount = players[i].Credits
+				logger.Debug("player all in", zap.Int("loss streak", lossStreak), zap.Uint64("next bet", players[i].Hands[j].BetAmount), zap.Int("round", round))
+			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
 				lossStreak = 0
 				players[i].Hands[j].BetAmount = oneCreditValue
-			case utils.Push:
+			case utils.Push, utils.SplitWon1:
 				continue
 			default:
 				return fmt.Errorf("invalid result: %s", *players[i].Hands[j].Result)
-			}
-
-			if players[i].Hands[j].BetAmount > players[i].Credits {
-				players[i].Hands[j].BetAmount = players[i].Credits
-				logger.Debug("player all in", zap.Int("loss streak", lossStreak), zap.Uint64("next bet", players[i].Hands[j].BetAmount), zap.Int("round", round))
 			}
 		}
 

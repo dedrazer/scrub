@@ -47,15 +47,16 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 
 	var i uint = 0
 	for i < simulationConfig.Rounds && (players[0].Credits > 0 || simulationConfig.RebuyCount > 0) {
-		i++
+		logger.Debug("starting round", zap.Uint("round", i))
 
 		if players[0].Credits == 0 {
+			roundsSinceLastCredit := i - lastCreditRound
+
 			players[0].Credits = simulationConfig.StartingCredits
 			players[0].Hands[0].BetAmount = simulationConfig.OneCreditAmount
 			simulationConfig.RebuyCount--
 			logger.Debug("player rebuy", zap.Int("rebuys remaining", simulationConfig.RebuyCount))
 
-			roundsSinceLastCredit := i - lastCreditRound
 			lastCreditRound = i
 			creditAtRound = append(creditAtRound, roundsSinceLastCredit)
 		}
@@ -79,6 +80,8 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 		if err != nil {
 			return errors.ErrFailedSubMethod("Play", err)
 		}
+
+		i++
 	}
 
 	logger.Info("simulation complete", zap.Uint("rounds", i), zap.Int("rebuys", startingRebuyCount-simulationConfig.RebuyCount))
