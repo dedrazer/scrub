@@ -2,6 +2,7 @@ package blackjack
 
 import (
 	"fmt"
+	"scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
 	"scrub/internal/entities/player"
 	internalTesting "scrub/internal/testing"
@@ -53,7 +54,7 @@ func TestBlackjack_Result(t *testing.T) {
 				},
 			},
 			expectedResultCredits: []uint64{1050},
-			expectedResult:        win,
+			expectedResult:        utils.Win,
 		},
 		{
 			name: "OK Player Bust",
@@ -157,7 +158,7 @@ func TestBlackjack_Result(t *testing.T) {
 			}
 
 			switch tc.expectedResult {
-			case win:
+			case utils.Win:
 				require.Equal(t, uint64(1), bj.PlayerWins)
 				require.Equal(t, uint64(0), bj.PlayerLosses)
 				require.Equal(t, uint64(0), bj.Pushes)

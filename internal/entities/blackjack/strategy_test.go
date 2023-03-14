@@ -86,6 +86,8 @@ func TestStrategy1(t *testing.T) {
 		},
 	}
 
+	playerCredits := uint64(1000)
+
 	for testNumber, testCase := range testCases {
 		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, testNumber, testCase.name), func(t *testing.T) {
 			dealerHand := DealerHand{
@@ -101,7 +103,7 @@ func TestStrategy1(t *testing.T) {
 				playerHand.cards = append(playerHand.cards, deck.Card{Symbol: symbol, Value: deck.CardValues[symbol]})
 			}
 
-			actual := Strategy(playerHand, dealerHand)
+			actual := Strategy(playerHand, dealerHand, playerCredits)
 			require.Equal(t, testCase.expected, actual)
 		})
 	}

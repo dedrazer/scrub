@@ -39,9 +39,11 @@ func TestHand_CanSplit(t *testing.T) {
 		},
 	}
 
+	playerCredits := uint64(1000)
+
 	for tn, tc := range testCases {
 		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
-			actual := tc.input.CanSplit()
+			actual := tc.input.CanSplit(playerCredits)
 			require.Equal(t, tc.expected, actual)
 		})
 	}

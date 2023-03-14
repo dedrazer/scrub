@@ -13,11 +13,11 @@ import (
 
 func TestBlackjack_Play(t *testing.T) {
 	type testCase struct {
-		name                  string
-		inputPlayers          []BlackjackPlayer
-		inputDealerHand       DealerHand
-		expectedErr           error
-		expectedNumberOfHands int
+		name            string
+		inputPlayers    []BlackjackPlayer
+		inputDealerHand DealerHand
+		expectedErr     error
+		expectedSplit   bool
 	}
 
 	testLogger, err := zap.NewDevelopment()
@@ -54,7 +54,7 @@ func TestBlackjack_Play(t *testing.T) {
 					},
 				},
 			},
-			expectedNumberOfHands: 1,
+			expectedSplit: false,
 		},
 		{
 			name: "OK Split",
@@ -80,7 +80,7 @@ func TestBlackjack_Play(t *testing.T) {
 					},
 				},
 			},
-			expectedNumberOfHands: 2,
+			expectedSplit: true,
 		},
 	}
 
@@ -96,7 +96,10 @@ func TestBlackjack_Play(t *testing.T) {
 			}
 
 			require.NoError(t, err, "unexpected error")
-			require.Len(t, tc.inputPlayers[0].Hands, tc.expectedNumberOfHands, "number of hands")
+
+			if tc.expectedSplit {
+				require.Equal(t, uint64(1), testBlackjack.SplitCount, "split count")
+			}
 		})
 	}
 }
