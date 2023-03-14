@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/blackjack/utils"
-
-	"go.uber.org/zap"
 )
 
 type Martingale struct {
 	CommonStrategyVariables
 }
 
-func (m *Martingale) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
+func (m *Martingale) Strategy(players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {
@@ -27,7 +25,7 @@ func (m *Martingale) Strategy(logger *zap.Logger, players []blackjack.BlackjackP
 					continue
 				}
 
-				playerAllIn(logger, &players[i], j)
+				playerAllIn(m.Logger, &players[i], j, m.round, m.lossStreak)
 			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
 				m.lossStreak = 0
 				players[i].Hands[j].BetAmount = oneCreditValue

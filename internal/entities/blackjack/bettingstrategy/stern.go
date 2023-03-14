@@ -3,8 +3,6 @@ package bettingstrategy
 import (
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/blackjack/utils"
-
-	"go.uber.org/zap"
 )
 
 type Stern struct {
@@ -13,7 +11,7 @@ type Stern struct {
 	CommonStrategyVariables
 }
 
-func (s Stern) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
+func (s Stern) Strategy(players []blackjack.BlackjackPlayer) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {
@@ -30,14 +28,14 @@ func (s Stern) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer,
 						continue
 					}
 
-					playerAllIn(logger, &players[i], j)
+					playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak)
 				}
 
 				// end of cycle
 				if s.winStreak == 2 {
 					s.winStreak = 0
 					s.level = 0
-					players[i].Hands[j].BetAmount = oneCreditValue
+					players[i].Hands[j].BetAmount = s.OneCreditValue
 				}
 			case utils.Push, utils.SplitWon1:
 				continue
@@ -52,7 +50,7 @@ func (s Stern) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer,
 						continue
 					}
 
-					playerAllIn(logger, &players[i], j)
+					playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak)
 				}
 			}
 		}

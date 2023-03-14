@@ -1,7 +1,11 @@
 package bettingstrategy
 
+import "go.uber.org/zap"
+
 type CommonStrategyVariables struct {
-	lossStreak int
-	winStreak  int
-	round      int
+	Logger         *zap.Logger
+	OneCreditValue uint64
+	lossStreak     int
+	winStreak      int
+	round          int
 }

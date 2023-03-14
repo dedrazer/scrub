@@ -92,7 +92,7 @@ func Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStra
 			highestProfitPercentage = profitPercentage
 		}
 
-		err := bettingStrategy.Strategy(logger, players, simulationConfig.OneCreditAmount)
+		err := bettingStrategy.Strategy(players)
 		if err != nil {
 			return errors.ErrFailedSubMethod("bettingStrategy", err)
 		}
