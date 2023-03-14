@@ -8,7 +8,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
+type Martingale struct {
+	CommonStrategyVariables
+}
+
+func (m *Martingale) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {
@@ -19,13 +23,13 @@ func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCred
 			case utils.Loss, utils.SplitWon0:
 				if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
 					players[i].Hands[j].BetAmount *= 2
-					lossStreak++
+					m.lossStreak++
 					continue
 				}
 
 				playerAllIn(logger, &players[i], j)
 			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
-				lossStreak = 0
+				m.lossStreak = 0
 				players[i].Hands[j].BetAmount = oneCreditValue
 			case utils.Push, utils.SplitWon1:
 				continue
@@ -34,7 +38,7 @@ func Martingale(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCred
 			}
 		}
 
-		round++
+		m.round++
 	}
 
 	return nil

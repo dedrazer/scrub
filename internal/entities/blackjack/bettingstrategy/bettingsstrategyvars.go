@@ -1,7 +1,7 @@
 package bettingstrategy
 
-var (
+type CommonStrategyVariables struct {
 	lossStreak int
 	winStreak  int
 	round      int
-)
+}

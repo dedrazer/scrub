@@ -7,12 +7,13 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	sternLevel      int
-	sternLossStreak int
-)
+type Stern struct {
+	level      int
+	lossStreak int
+	CommonStrategyVariables
+}
 
-func Stern(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
+func (s Stern) Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {
@@ -21,9 +22,9 @@ func Stern(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditVal
 
 			switch *players[i].Hands[j].Result {
 			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
-				winStreak++
+				s.winStreak++
 
-				if winStreak == 1 {
+				if s.winStreak == 1 {
 					if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
 						players[i].Hands[j].BetAmount *= 2
 						continue
@@ -33,18 +34,18 @@ func Stern(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditVal
 				}
 
 				// end of cycle
-				if winStreak == 2 {
-					winStreak = 0
-					sternLevel = 0
+				if s.winStreak == 2 {
+					s.winStreak = 0
+					s.level = 0
 					players[i].Hands[j].BetAmount = oneCreditValue
 				}
 			case utils.Push, utils.SplitWon1:
 				continue
 			case utils.Loss, utils.SplitWon0:
-				sternLossStreak++
-				if (sternLevel == 0 && sternLossStreak == 3) || (sternLevel > 0 && sternLossStreak == 2) {
-					sternLevel++
-					sternLossStreak = 0
+				s.lossStreak++
+				if (s.level == 0 && s.lossStreak == 3) || (s.level > 0 && s.lossStreak == 2) {
+					s.level++
+					s.lossStreak = 0
 
 					if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
 						players[i].Hands[j].BetAmount *= 2
@@ -58,4 +59,8 @@ func Stern(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditVal
 	}
 
 	return nil
+}
+
+func (s Stern) GetName() string {
+	return "stern"
 }

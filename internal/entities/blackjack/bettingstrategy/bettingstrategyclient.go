@@ -6,6 +6,11 @@ import (
 	"go.uber.org/zap"
 )
 
+type Strategy interface {
+	GetName() string
+	Strategy(logger *zap.Logger, players []blackjack.BlackjackPlayer, oneCreditValue uint64) error
+}
+
 func playerAllIn(logger *zap.Logger, player *blackjack.BlackjackPlayer, handNumber int) {
 	player.Hands[handNumber].BetAmount = player.Credits
 	logger.Debug("player all in",

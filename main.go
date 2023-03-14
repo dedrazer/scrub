@@ -23,12 +23,14 @@ func main() {
 	simulationConfig := blackjackanalytics.SimulationConfig{
 		Rounds:          1000000,
 		Decks:           6,
+		BankCredits:     3000000,
+		BankAtCredits:   10000,
 		StartingCredits: 3000,
 		OneCreditAmount: 50,
 		RebuyCount:      20000,
 	}
 
-	err = blackjackanalytics.Simulate(logger, simulationConfig, bettingstrategy.Martingale)
+	err = blackjackanalytics.Simulate(logger, simulationConfig, bettingstrategy.Stern{})
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}
