@@ -33,6 +33,8 @@ type Simulator struct {
 	highestProfitPercentage float64
 	numberOfDeposits        uint
 	numberOfWithdrawals     uint
+	currentRound            uint
+	SimulationConfig
 }
 
 func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config SimulationConfig) *Simulator {
@@ -55,24 +57,17 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 
 	bj := blackjack.NewBlackjack(simulationConfig.Decks)
 
-	var i uint = 0
-	for i < simulationConfig.Rounds && (players[0].Credits > 0 || (simulationConfig.RebuyCount > 0 && simulationConfig.BankCredits > 0)) {
-		err := s.simulationRound(logger, simulationConfig, bettingStrategy, players, bj, i)
+	s.currentRound = 0
+	for s.currentRound < simulationConfig.Rounds && (players[0].Credits > 0 || (simulationConfig.RebuyCount > 0 && simulationConfig.BankCredits > 0)) {
+		err := s.simulationRound(logger, simulationConfig, bettingStrategy, players, bj, s.currentRound)
 		if err != nil {
 			return errors.ErrFailedSubMethod("simulationRound", err)
 		}
 
-		i++
+		s.currentRound++
 	}
 
-	depositPercentage := float64(s.numberOfDeposits) / float64(s.numberOfWithdrawals)
-
-	logger.Info("simulation complete",
-		zap.Uint("rounds", i),
-		zap.Int("remaining rebuys", s.startingRebuyCount-simulationConfig.RebuyCount),
-		zap.Uint("deposits", s.numberOfDeposits),
-		zap.Uint("withdrawals", s.numberOfWithdrawals),
-		zap.String("deposit percentage", fmt.Sprintf("%.2f%%", depositPercentage*100)))
+	s.logSimulationCompletion()
 
 	for j := range players {
 		players[j].LogStatistics(logger)
@@ -97,7 +92,7 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 		zap.String("average round duration", averageRoundDuration))
 
 	totalRounds := uint64(0)
-	earliestBankruptcyRound := i
+	earliestBankruptcyRound := s.currentRound
 	for j := range s.creditAtRound {
 		if s.creditAtRound[j] != 0 && s.creditAtRound[j] < earliestBankruptcyRound {
 			earliestBankruptcyRound = s.creditAtRound[j]
@@ -117,7 +112,7 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 		EndingCredits:              simulationConfig.BankCredits,
 		RebuyCredits:               simulationConfig.StartingCredits,
 		BankAtCredits:              simulationConfig.BankAtCredits,
-		Score:                      float64(s.highestProfitPercentage) * depositPercentage * float64(averageRoundsSurvived) * float64(oneCreditPercentageOfTotal),
+		Score:                      float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(averageRoundsSurvived) * float64(oneCreditPercentageOfTotal),
 	}
 
 	logger.Info("strategy results", zap.Any("results", res))
@@ -201,4 +196,21 @@ func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPla
 			},
 		},
 	}
+}
+
+func (s *Simulator) logSimulationCompletion() {
+	s.logger.Info("simulation complete",
+		zap.Uint("rounds", s.currentRound),
+		zap.Int("remaining rebuys", s.startingRebuyCount-s.RebuyCount),
+		zap.Uint("deposits", s.numberOfDeposits),
+		zap.Uint("withdrawals", s.numberOfWithdrawals),
+		zap.String("deposit percentage", fmt.Sprintf("%.2f%%", s.getDepositPercentage()*100)))
+}
+
+func (s *Simulator) getDepositPercentage() float64 {
+	if s.numberOfWithdrawals == 0 {
+		return 1
+	}
+
+	return float64(s.numberOfDeposits) / float64(s.numberOfWithdrawals)
 }
