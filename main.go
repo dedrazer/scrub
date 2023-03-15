@@ -36,10 +36,10 @@ func main() {
 			Logger:         logger,
 		},
 	}
-	
+
 	simulator := blackjackanalytics.NewSimulator(logger, strategy, simulationConfig)
 
-	err = simulator.Simulate(logger, simulationConfig, strategy)
+	err = simulator.Simulate(strategy)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}

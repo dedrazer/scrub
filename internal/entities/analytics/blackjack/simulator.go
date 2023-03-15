@@ -25,6 +25,7 @@ type SimulationConfig struct {
 type Simulator struct {
 	logger                  *zap.Logger
 	strategy                bettingstrategy.Strategy
+	players                 []blackjack.BlackjackPlayer
 	startingTime            time.Time
 	startingRebuyCount      int
 	startingBankCredits     uint64
@@ -47,21 +48,22 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 		lastCreditRound:         uint(0),
 		creditAtRound:           make([]uint, 1),
 		highestProfitPercentage: float64(1),
+		SimulationConfig:        config,
 	}
 }
 
-func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConfig, bettingStrategy bettingstrategy.Strategy) error {
-	logger.Info("starting simulation", zap.Any("config", simulationConfig))
+func (s *Simulator) Simulate(bettingStrategy bettingstrategy.Strategy) error {
+	s.logger.Info("starting simulation", zap.Any("config", s.SimulationConfig))
 
-	players := initTestPlayers(simulationConfig)
+	s.players = initTestPlayers(s.SimulationConfig)
 
-	bj := blackjack.NewBlackjack(simulationConfig.Decks)
+	bj := blackjack.NewBlackjack(s.SimulationConfig.Decks)
 
 	s.currentRound = 0
-	for s.currentRound < simulationConfig.Rounds && (players[0].Credits > 0 || (simulationConfig.RebuyCount > 0 && simulationConfig.BankCredits > 0)) {
-		err := s.simulationRound(logger, simulationConfig, bettingStrategy, players, bj, s.currentRound)
+	for s.currentRound < s.Rounds && (s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)) {
+		err := s.simulateRound(bettingStrategy, bj, s.currentRound)
 		if err != nil {
-			return errors.ErrFailedSubMethod("simulationRound", err)
+			return errors.ErrFailedSubMethod("simulateRound", err)
 		}
 
 		s.currentRound++
@@ -69,11 +71,11 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 
 	s.logSimulationCompletion()
 
-	for j := range players {
-		players[j].LogStatistics(logger)
+	for j := range s.players {
+		s.players[j].LogStatistics(s.logger)
 	}
 
-	bj.LogStatistics(logger)
+	bj.LogStatistics(s.logger)
 
 	totalDurationMs := time.Since(s.startingTime).Milliseconds()
 	var totalDurationTextual string
@@ -84,9 +86,9 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 		totalDurationTextual = fmt.Sprintf("%dms", totalDurationMs)
 	}
 
-	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(simulationConfig.Rounds))*1000)
-	roundsPerSecond := int64(float64(int64(simulationConfig.Rounds)*1000) / float64(totalDurationMs))
-	logger.Info("runtime statistics",
+	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(s.Rounds))*1000)
+	roundsPerSecond := int64(float64(s.Rounds*1000) / float64(totalDurationMs))
+	s.logger.Info("runtime statistics",
 		zap.String("duration", totalDurationTextual),
 		zap.Int64("rounds per second", roundsPerSecond),
 		zap.String("average round duration", averageRoundDuration))
@@ -101,7 +103,7 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 		totalRounds += uint64(s.creditAtRound[j])
 	}
 	averageRoundsSurvived := float64(totalRounds) / float64(len(s.creditAtRound))
-	oneCreditPercentageOfTotal := float64(simulationConfig.OneCreditAmount) / float64(simulationConfig.StartingCredits)
+	oneCreditPercentageOfTotal := float64(s.OneCreditAmount) / float64(s.StartingCredits)
 
 	res := models.SimulationResults{
 		AverageRoundsSurvived:      uint(averageRoundsSurvived),
@@ -109,76 +111,80 @@ func (s *Simulator) Simulate(logger *zap.Logger, simulationConfig SimulationConf
 		HighestProfitPercentage:    s.highestProfitPercentage,
 		OneCreditPercentageOfTotal: oneCreditPercentageOfTotal,
 		StartingCredits:            s.startingBankCredits,
-		EndingCredits:              simulationConfig.BankCredits,
-		RebuyCredits:               simulationConfig.StartingCredits,
-		BankAtCredits:              simulationConfig.BankAtCredits,
+		EndingCredits:              s.BankCredits,
+		RebuyCredits:               s.StartingCredits,
+		BankAtCredits:              s.BankAtCredits,
 		Score:                      float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(averageRoundsSurvived) * float64(oneCreditPercentageOfTotal),
 	}
 
-	logger.Info("strategy results", zap.Any("results", res))
+	s.logger.Info("strategy results", zap.Any("results", res))
 
 	return nil
 }
 
-func (s *Simulator) simulationRound(logger *zap.Logger, simulationConfig SimulationConfig, bettingStrategy bettingstrategy.Strategy, players []blackjack.BlackjackPlayer, bj *blackjack.Blackjack, i uint) error {
-	logger.Debug("starting round", zap.Uint("round", i))
+func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *blackjack.Blackjack, i uint) error {
+	s.logger.Debug("starting round", zap.Uint("round", i))
 
-	if players[0].Credits == 0 {
+	if s.players[0].Credits == 0 {
 		roundsSinceLastCredit := i - s.lastCreditRound
 
-		if simulationConfig.BankCredits >= simulationConfig.StartingCredits {
-			players[0].Credits = simulationConfig.StartingCredits
-			simulationConfig.BankCredits -= simulationConfig.StartingCredits
-			s.numberOfWithdrawals++
-			logger.Debug("withdrew", zap.Uint64("credits", simulationConfig.StartingCredits), zap.Uint("round", i))
-		} else {
-			players[0].Credits = simulationConfig.BankCredits
-			simulationConfig.BankCredits = 0
-			logger.Info("bank is out of credits", zap.Uint("round", i))
-			s.numberOfWithdrawals++
-			logger.Debug("withdrew", zap.Uint64("credits", players[0].Credits), zap.Uint("round", i))
-		}
+		s.withdrawFromBank()
 
-		players[0].Hands[0].BetAmount = simulationConfig.OneCreditAmount
-		simulationConfig.RebuyCount--
-		logger.Debug("player rebuy", zap.Int("rebuys remaining", simulationConfig.RebuyCount))
+		s.players[0].Hands[0].BetAmount = s.OneCreditAmount
+		s.RebuyCount--
+		s.logger.Debug("player rebuy", zap.Int("rebuys remaining", s.RebuyCount))
 
 		s.lastCreditRound = i
 		s.creditAtRound = append(s.creditAtRound, roundsSinceLastCredit)
 	}
 
-	if players[0].Credits >= simulationConfig.BankAtCredits {
-		simulationConfig.BankCredits += players[0].Credits - simulationConfig.StartingCredits
+	if s.players[0].Credits >= s.BankAtCredits {
+		s.BankCredits += s.players[0].Credits - s.StartingCredits
 		s.numberOfDeposits++
-		logger.Debug("deposited", zap.Uint64("credits", players[0].Credits-simulationConfig.StartingCredits), zap.Uint("round", i))
-		players[0].Credits = simulationConfig.StartingCredits
+		s.logger.Debug("deposited", zap.Uint64("credits", s.players[0].Credits-s.StartingCredits), zap.Uint("round", i))
+		s.players[0].Credits = s.StartingCredits
 	}
 
-	profitPercentage := float64(players[0].Credits) / float64(simulationConfig.StartingCredits)
+	profitPercentage := float64(s.players[0].Credits) / float64(s.StartingCredits)
 	if profitPercentage > s.highestProfitPercentage {
 		s.highestProfitPercentage = profitPercentage
 	}
 
-	err := bettingStrategy.Strategy(players)
+	err := bettingStrategy.Strategy(s.players)
 	if err != nil {
 		return errors.ErrFailedSubMethod("bettingStrategy", err)
 	}
 
-	if players[0].Hands[0].BetAmount > players[0].Credits {
-		players[0].Hands[0].BetAmount = players[0].Credits
+	if s.players[0].Hands[0].BetAmount > s.players[0].Credits {
+		s.players[0].Hands[0].BetAmount = s.players[0].Credits
 	}
 
-	dealerHand, err := bj.DealRound(players)
+	dealerHand, err := bj.DealRound(s.players)
 	if err != nil {
 		return errors.ErrFailedSubMethod("DealRound", err)
 	}
 
-	err = bj.Play(logger, players, dealerHand, blackjack.Strategy)
+	err = bj.Play(s.logger, s.players, dealerHand, blackjack.Strategy)
 	if err != nil {
 		return errors.ErrFailedSubMethod("Play", err)
 	}
 
 	return nil
+}
+
+func (s *Simulator) withdrawFromBank() {
+	if s.BankCredits >= s.StartingCredits {
+		s.players[0].Credits = s.StartingCredits
+		s.BankCredits -= s.StartingCredits
+		s.numberOfWithdrawals++
+		s.logger.Debug("withdrew", zap.Uint64("credits", s.StartingCredits), zap.Uint("round", s.currentRound))
+	} else {
+		s.players[0].Credits = s.BankCredits
+		s.BankCredits = 0
+		s.logger.Info("bank is out of credits", zap.Uint("round", s.currentRound))
+		s.numberOfWithdrawals++
+		s.logger.Debug("withdrew", zap.Uint64("credits", s.players[0].Credits), zap.Uint("round", s.currentRound))
+	}
 }
 
 func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPlayer {
