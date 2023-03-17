@@ -24,7 +24,8 @@ type SimulationConfig struct {
 
 type Simulator struct {
 	logger                  *zap.Logger
-	strategy                bettingstrategy.Strategy
+	bettingStrategy         bettingstrategy.Strategy
+	blackjackEngine         *blackjack.Blackjack
 	players                 []blackjack.BlackjackPlayer
 	startingTime            time.Time
 	startingRebuyCount      int
@@ -41,7 +42,7 @@ type Simulator struct {
 func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config SimulationConfig) *Simulator {
 	return &Simulator{
 		logger:                  logger,
-		strategy:                strategy,
+		bettingStrategy:         strategy,
 		startingTime:            time.Now().UTC(),
 		startingRebuyCount:      config.RebuyCount,
 		startingBankCredits:     config.BankCredits,
@@ -52,16 +53,16 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 	}
 }
 
-func (s *Simulator) Simulate(bettingStrategy bettingstrategy.Strategy) error {
+func (s *Simulator) Simulate() error {
 	s.logger.Info("starting simulation", zap.Any("config", s.SimulationConfig))
 
 	s.players = initTestPlayers(s.SimulationConfig)
 
-	bj := blackjack.NewBlackjack(s.SimulationConfig.Decks)
+	s.blackjackEngine = blackjack.NewBlackjack(s.SimulationConfig.Decks)
 
 	s.currentRound = 0
 	for s.currentRound < s.Rounds && (s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)) {
-		err := s.simulateRound(bettingStrategy, bj, s.currentRound)
+		err := s.simulateRound()
 		if err != nil {
 			return errors.ErrFailedSubMethod("simulateRound", err)
 		}
@@ -75,7 +76,7 @@ func (s *Simulator) Simulate(bettingStrategy bettingstrategy.Strategy) error {
 		s.players[j].LogStatistics(s.logger)
 	}
 
-	bj.LogStatistics(s.logger)
+	s.blackjackEngine.LogStatistics(s.logger)
 
 	totalDurationMs := time.Since(s.startingTime).Milliseconds()
 	var totalDurationTextual string
@@ -122,11 +123,11 @@ func (s *Simulator) Simulate(bettingStrategy bettingstrategy.Strategy) error {
 	return nil
 }
 
-func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *blackjack.Blackjack, i uint) error {
-	s.logger.Debug("starting round", zap.Uint("round", i))
+func (s *Simulator) simulateRound() error {
+	s.logger.Debug("starting round", zap.Uint("round", s.currentRound))
 
 	if s.players[0].Credits == 0 {
-		roundsSinceLastCredit := i - s.lastCreditRound
+		roundsSinceLastCredit := s.currentRound - s.lastCreditRound
 
 		s.withdrawFromBank()
 
@@ -134,14 +135,14 @@ func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *
 		s.RebuyCount--
 		s.logger.Debug("player rebuy", zap.Int("rebuys remaining", s.RebuyCount))
 
-		s.lastCreditRound = i
+		s.lastCreditRound = s.currentRound
 		s.creditAtRound = append(s.creditAtRound, roundsSinceLastCredit)
 	}
 
 	if s.players[0].Credits >= s.BankAtCredits {
 		s.BankCredits += s.players[0].Credits - s.StartingCredits
 		s.numberOfDeposits++
-		s.logger.Debug("deposited", zap.Uint64("credits", s.players[0].Credits-s.StartingCredits), zap.Uint("round", i))
+		s.logger.Debug("deposited", zap.Uint64("credits", s.players[0].Credits-s.StartingCredits), zap.Uint("round", s.currentRound))
 		s.players[0].Credits = s.StartingCredits
 	}
 
@@ -150,7 +151,7 @@ func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *
 		s.highestProfitPercentage = profitPercentage
 	}
 
-	err := bettingStrategy.Strategy(s.players)
+	err := s.bettingStrategy.Strategy(s.players)
 	if err != nil {
 		return errors.ErrFailedSubMethod("bettingStrategy", err)
 	}
@@ -159,12 +160,12 @@ func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *
 		s.players[0].Hands[0].BetAmount = s.players[0].Credits
 	}
 
-	dealerHand, err := bj.DealRound(s.players)
+	dealerHand, err := s.blackjackEngine.DealRound(s.players)
 	if err != nil {
 		return errors.ErrFailedSubMethod("DealRound", err)
 	}
 
-	err = bj.Play(s.logger, s.players, dealerHand, blackjack.Strategy)
+	err = s.blackjackEngine.Play(s.logger, s.players, dealerHand, blackjack.Strategy)
 	if err != nil {
 		return errors.ErrFailedSubMethod("Play", err)
 	}
@@ -173,18 +174,21 @@ func (s *Simulator) simulateRound(bettingStrategy bettingstrategy.Strategy, bj *
 }
 
 func (s *Simulator) withdrawFromBank() {
+	var amount uint64
+
 	if s.BankCredits >= s.StartingCredits {
 		s.players[0].Credits = s.StartingCredits
 		s.BankCredits -= s.StartingCredits
-		s.numberOfWithdrawals++
-		s.logger.Debug("withdrew", zap.Uint64("credits", s.StartingCredits), zap.Uint("round", s.currentRound))
+		amount = s.StartingCredits
 	} else {
 		s.players[0].Credits = s.BankCredits
 		s.BankCredits = 0
 		s.logger.Info("bank is out of credits", zap.Uint("round", s.currentRound))
-		s.numberOfWithdrawals++
-		s.logger.Debug("withdrew", zap.Uint64("credits", s.players[0].Credits), zap.Uint("round", s.currentRound))
+		amount = s.players[0].Credits
 	}
+
+	s.logger.Debug("withdrew", zap.Uint64("credits", amount), zap.Uint("round", s.currentRound))
+	s.numberOfWithdrawals++
 }
 
 func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPlayer {

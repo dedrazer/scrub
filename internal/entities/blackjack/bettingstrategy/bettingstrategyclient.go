@@ -11,9 +11,10 @@ type Strategy interface {
 	Strategy(players []blackjack.BlackjackPlayer) error
 }
 
-func playerAllIn(logger *zap.Logger, player *blackjack.BlackjackPlayer, handNumber, round, lossStreak int) {
+func playerAllIn(logger *zap.Logger, player *blackjack.BlackjackPlayer, handNumber, round, lossStreak int, roundResult string) {
 	player.Hands[handNumber].BetAmount = player.Credits
 	logger.Debug("player all in",
+		zap.String("round result", roundResult),
 		zap.Int("loss streak", lossStreak),
 		zap.Uint64("next bet", player.Hands[handNumber].BetAmount),
 		zap.Int("round", round))

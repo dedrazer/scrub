@@ -25,7 +25,7 @@ func (m *Martingale) Strategy(players []blackjack.BlackjackPlayer, oneCreditValu
 					continue
 				}
 
-				playerAllIn(m.Logger, &players[i], j, m.round, m.lossStreak)
+				playerAllIn(m.Logger, &players[i], j, m.round, m.lossStreak, utils.Loss)
 			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
 				m.lossStreak = 0
 				players[i].Hands[j].BetAmount = oneCreditValue
@@ -35,9 +35,9 @@ func (m *Martingale) Strategy(players []blackjack.BlackjackPlayer, oneCreditValu
 				return fmt.Errorf("invalid result: %s", *players[i].Hands[j].Result)
 			}
 		}
-
-		m.round++
 	}
+	
+	m.round++
 
 	return nil
 }

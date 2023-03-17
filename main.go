@@ -11,7 +11,7 @@ import (
 func main() {
 	config := zap.NewProductionConfig()
 	config.DisableCaller = true
-	config.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
+	config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 
 	logger, err := config.Build()
 	if err != nil {
@@ -21,7 +21,7 @@ func main() {
 	//deck.Demo(logger)
 	//blackjack.Demo(logger)
 	simulationConfig := blackjackanalytics.SimulationConfig{
-		Rounds:          10000,
+		Rounds:          100000,
 		Decks:           6,
 		BankCredits:     3000000,
 		BankAtCredits:   10000,
@@ -37,9 +37,9 @@ func main() {
 		},
 	}
 
-	simulator := blackjackanalytics.NewSimulator(logger, strategy, simulationConfig)
+	simulator := blackjackanalytics.NewSimulator(logger, &strategy, simulationConfig)
 
-	err = simulator.Simulate(strategy)
+	err = simulator.Simulate()
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}

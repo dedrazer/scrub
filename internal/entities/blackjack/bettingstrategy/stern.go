@@ -11,7 +11,7 @@ type Stern struct {
 	CommonStrategyVariables
 }
 
-func (s Stern) Strategy(players []blackjack.BlackjackPlayer) error {
+func (s *Stern) Strategy(players []blackjack.BlackjackPlayer) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {
@@ -22,43 +22,46 @@ func (s Stern) Strategy(players []blackjack.BlackjackPlayer) error {
 			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
 				s.winStreak++
 
-				if s.winStreak == 1 {
-					if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
-						players[i].Hands[j].BetAmount *= 2
-						continue
-					}
-
-					playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak)
-				}
-
 				// end of cycle
 				if s.winStreak == 2 {
 					s.winStreak = 0
 					s.level = 0
 					players[i].Hands[j].BetAmount = s.OneCreditValue
 				}
+
+				if s.winStreak == 1 {
+					if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
+						players[i].Hands[j].BetAmount *= 2
+					} else {
+						playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak, utils.Win)
+					}
+				}
+
+				s.lossStreak = 0
 			case utils.Push, utils.SplitWon1:
 				continue
 			case utils.Loss, utils.SplitWon0:
 				s.lossStreak++
+				s.winStreak = 0
 				if (s.level == 0 && s.lossStreak == 3) || (s.level > 0 && s.lossStreak == 2) {
-					s.level++
-					s.lossStreak = 0
-
-					if players[i].Credits >= players[i].Hands[j].BetAmount*2 {
+					if players[i].Credits < players[i].Hands[j].BetAmount*2 {
+						playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak, utils.Loss)
+					} else {
 						players[i].Hands[j].BetAmount *= 2
-						continue
 					}
 
-					playerAllIn(s.Logger, &players[i], j, s.round, s.lossStreak)
+					s.level++
+					s.lossStreak = 0
 				}
 			}
 		}
 	}
 
+	s.round++
+
 	return nil
 }
 
-func (s Stern) GetName() string {
+func (s *Stern) GetName() string {
 	return "stern"
 }
