@@ -79,13 +79,7 @@ func (s *Simulator) Simulate() error {
 	s.blackjackEngine.LogStatistics(s.logger)
 
 	totalDurationMs := time.Since(s.startingTime).Milliseconds()
-	var totalDurationTextual string
-
-	if totalDurationMs > 10000 {
-		totalDurationTextual = fmt.Sprintf("%ds", totalDurationMs/1000)
-	} else {
-		totalDurationTextual = fmt.Sprintf("%dms", totalDurationMs)
-	}
+	totalDurationTextual := s.getTextualDuration(totalDurationMs)
 
 	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(s.Rounds))*1000)
 	roundsPerSecond := int64(float64(s.Rounds*1000) / float64(totalDurationMs))
@@ -215,6 +209,22 @@ func (s *Simulator) logSimulationCompletion() {
 		zap.Uint("deposits", s.numberOfDeposits),
 		zap.Uint("withdrawals", s.numberOfWithdrawals),
 		zap.String("deposit percentage", fmt.Sprintf("%.2f%%", s.getDepositPercentage()*100)))
+}
+
+func (s *Simulator) getTextualDuration(totalDurationMs int64) string {
+	if totalDurationMs < 1000 {
+		return fmt.Sprintf("%dms", totalDurationMs)
+	}
+
+	if totalDurationMs < 60000 {
+		return fmt.Sprintf("%.2fsec", float64(totalDurationMs)/1000)
+	}
+
+	if totalDurationMs < 3600000 {
+		return fmt.Sprintf("%.2fmin", float64(totalDurationMs)/60000)
+	}
+
+	return fmt.Sprintf("%.2fh", float64(totalDurationMs)/3600000)
 }
 
 func (s *Simulator) getDepositPercentage() float64 {
