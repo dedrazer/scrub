@@ -78,20 +78,11 @@ func (s *Simulator) Simulate() error {
 
 	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(s.MaxRounds))*1000)
 	roundsPerSecond := int64(float64(s.MaxRounds*1000) / float64(totalDurationMs))
-	s.logger.Info("runtime statistics",
-		zap.String("duration", totalDurationTextual),
-		zap.Int64("rounds per second", roundsPerSecond),
-		zap.String("average round duration", averageRoundDuration))
 
-	totalRounds := uint64(0)
-	earliestBankruptcyRound := s.currentRound
-	for j := range s.creditAtRound {
-		if s.creditAtRound[j] != 0 && s.creditAtRound[j] < earliestBankruptcyRound {
-			earliestBankruptcyRound = s.creditAtRound[j]
-		}
+	s.logRuntimeStatistics(totalDurationTextual, averageRoundDuration, roundsPerSecond)
 
-		totalRounds += uint64(s.creditAtRound[j])
-	}
+	earliestBankruptcyRound, totalRounds := s.calculateEarliestBankruptcyRound()
+
 	averageRoundsSurvived := float64(totalRounds) / float64(len(s.creditAtRound))
 	oneCreditPercentageOfTotal := float64(s.OneCreditAmount) / float64(s.StartingCredits)
 
@@ -193,6 +184,21 @@ func (s *Simulator) withdrawFromBank() {
 	s.numberOfWithdrawals++
 }
 
+func (s *Simulator) calculateEarliestBankruptcyRound() (uint, uint64) {
+	totalRounds := uint64(0)
+	earliestBankruptcyRound := s.currentRound
+
+	for j := range s.creditAtRound {
+		if s.creditAtRound[j] != 0 && s.creditAtRound[j] < earliestBankruptcyRound {
+			earliestBankruptcyRound = s.creditAtRound[j]
+		}
+
+		totalRounds += uint64(s.creditAtRound[j])
+	}
+
+	return earliestBankruptcyRound, totalRounds
+}
+
 func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPlayer {
 	return []blackjack.BlackjackPlayer{
 		{
@@ -223,6 +229,13 @@ func (s *Simulator) logPlayersStatistics() {
 	for j := range s.players {
 		s.players[j].LogStatistics(s.logger)
 	}
+}
+
+func (s *Simulator) logRuntimeStatistics(totalDurationTextual, averageRoundDuration string, roundsPerSecond int64) {
+	s.logger.Info("runtime statistics",
+		zap.String("duration", totalDurationTextual),
+		zap.Int64("rounds per second", roundsPerSecond),
+		zap.String("average round duration", averageRoundDuration))
 }
 
 func (s *Simulator) hasPositiveBalance() bool {
