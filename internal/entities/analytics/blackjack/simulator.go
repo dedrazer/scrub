@@ -61,20 +61,15 @@ func (s *Simulator) Simulate() error {
 	s.blackjackEngine = blackjack.NewBlackjack(s.SimulationConfig.Decks)
 
 	s.currentRound = 0
-	for s.currentRound < s.MaxRounds && s.hasPositiveBalance() {
-		err := s.simulateRound()
-		if err != nil {
-			return errors.ErrFailedSubMethod("simulateRound", err)
-		}
 
-		s.currentRound++
+	err := s.simulateRounds()
+	if err != nil {
+		return err
 	}
 
 	s.logSimulationCompletion()
 
-	for j := range s.players {
-		s.players[j].LogStatistics(s.logger)
-	}
+	s.logPlayersStatistics()
 
 	s.blackjackEngine.LogStatistics(s.logger)
 
@@ -113,6 +108,19 @@ func (s *Simulator) Simulate() error {
 	}
 
 	s.logger.Info("strategy results", zap.Any("results", res))
+
+	return nil
+}
+
+func (s *Simulator) simulateRounds() error {
+	for s.currentRound < s.MaxRounds && s.hasPositiveBalance() {
+		err := s.simulateRound()
+		if err != nil {
+			return errors.ErrFailedSubMethod("simulateRound", err)
+		}
+
+		s.currentRound++
+	}
 
 	return nil
 }
@@ -209,6 +217,12 @@ func (s *Simulator) logSimulationCompletion() {
 		zap.Uint("deposits", s.numberOfDeposits),
 		zap.Uint("withdrawals", s.numberOfWithdrawals),
 		zap.String("deposit percentage", fmt.Sprintf("%.2f%%", s.getDepositPercentage()*100)))
+}
+
+func (s *Simulator) logPlayersStatistics() {
+	for j := range s.players {
+		s.players[j].LogStatistics(s.logger)
+	}
 }
 
 func (s *Simulator) hasPositiveBalance() bool {
