@@ -13,7 +13,7 @@ import (
 )
 
 type SimulationConfig struct {
-	Rounds          uint
+	MaxRounds       uint
 	Decks           uint
 	StartingCredits uint64
 	BankCredits     uint64
@@ -61,7 +61,7 @@ func (s *Simulator) Simulate() error {
 	s.blackjackEngine = blackjack.NewBlackjack(s.SimulationConfig.Decks)
 
 	s.currentRound = 0
-	for s.currentRound < s.Rounds && (s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)) {
+	for s.currentRound < s.MaxRounds && s.hasPositiveBalance() {
 		err := s.simulateRound()
 		if err != nil {
 			return errors.ErrFailedSubMethod("simulateRound", err)
@@ -81,8 +81,8 @@ func (s *Simulator) Simulate() error {
 	totalDurationMs := time.Since(s.startingTime).Milliseconds()
 	totalDurationTextual := s.getTextualDuration(totalDurationMs)
 
-	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(s.Rounds))*1000)
-	roundsPerSecond := int64(float64(s.Rounds*1000) / float64(totalDurationMs))
+	averageRoundDuration := fmt.Sprintf("%.2fμs", (float64(totalDurationMs)/float64(s.MaxRounds))*1000)
+	roundsPerSecond := int64(float64(s.MaxRounds*1000) / float64(totalDurationMs))
 	s.logger.Info("runtime statistics",
 		zap.String("duration", totalDurationTextual),
 		zap.Int64("rounds per second", roundsPerSecond),
@@ -209,6 +209,10 @@ func (s *Simulator) logSimulationCompletion() {
 		zap.Uint("deposits", s.numberOfDeposits),
 		zap.Uint("withdrawals", s.numberOfWithdrawals),
 		zap.String("deposit percentage", fmt.Sprintf("%.2f%%", s.getDepositPercentage()*100)))
+}
+
+func (s *Simulator) hasPositiveBalance() bool {
+	return s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)
 }
 
 func (s *Simulator) getTextualDuration(totalDurationMs int64) string {

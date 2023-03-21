@@ -21,7 +21,7 @@ func main() {
 	//deck.Demo(logger)
 	//blackjack.Demo(logger)
 	simulationConfig := blackjackanalytics.SimulationConfig{
-		Rounds:          100000,
+		MaxRounds:       100000,
 		Decks:           6,
 		BankCredits:     3000000,
 		BankAtCredits:   10000,
