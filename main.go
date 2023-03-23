@@ -30,17 +30,26 @@ func main() {
 		RebuyCount:      20000,
 	}
 
-	strategy := bettingstrategy.Stern{
-		CommonStrategyVariables: bettingstrategy.CommonStrategyVariables{
-			OneCreditValue: simulationConfig.OneCreditAmount,
-			Logger:         logger,
+	strategyConfigs := bettingstrategy.CommonStrategyVariables{
+		OneCreditValue: simulationConfig.OneCreditAmount,
+		Logger:         logger,
+	}
+
+	strategies := []bettingstrategy.Strategy{
+		&bettingstrategy.Stern{
+			CommonStrategyVariables: strategyConfigs,
+		},
+		&bettingstrategy.Martingale{
+			CommonStrategyVariables: strategyConfigs,
 		},
 	}
 
-	simulator := blackjackanalytics.NewSimulator(logger, &strategy, simulationConfig)
+	for i := range strategies {
+		simulator := blackjackanalytics.NewSimulator(logger, strategies[i], simulationConfig)
 
-	err = simulator.Simulate()
-	if err != nil {
-		logger.Fatal("unexpected error", zap.Error(err))
+		err = simulator.Simulate()
+		if err != nil {
+			logger.Fatal("unexpected error", zap.Error(err))
+		}
 	}
 }
