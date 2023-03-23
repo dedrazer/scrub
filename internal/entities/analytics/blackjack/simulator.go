@@ -30,12 +30,13 @@ type Simulator struct {
 	startingTime            time.Time
 	startingRebuyCount      int
 	startingBankCredits     uint64
-	lastCreditRound         uint
-	creditAtRound           []uint
 	highestProfitPercentage float64
 	numberOfDeposits        uint
 	numberOfWithdrawals     uint
 	currentRound            uint
+	lastCreditRound         uint
+	creditAtRound           []uint
+	earliestBankruptcyRound uint
 	SimulationConfig
 }
 
@@ -48,6 +49,7 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 		startingBankCredits:     config.BankCredits,
 		lastCreditRound:         uint(0),
 		creditAtRound:           make([]uint, 1),
+		earliestBankruptcyRound: config.MaxRounds,
 		highestProfitPercentage: float64(1),
 		SimulationConfig:        config,
 	}
@@ -81,14 +83,12 @@ func (s *Simulator) Simulate() error {
 
 	s.logRuntimeStatistics(totalDurationTextual, averageRoundDuration, roundsPerSecond)
 
-	earliestBankruptcyRound, totalRounds := s.calculateEarliestBankruptcyRound()
-
-	averageRoundsSurvived := float64(totalRounds) / float64(len(s.creditAtRound))
+	averageRoundsSurvived := float64(s.currentRound) / float64(len(s.creditAtRound))
 	oneCreditPercentageOfTotal := float64(s.OneCreditAmount) / float64(s.StartingCredits)
 
 	res := models.SimulationResults{
 		AverageRoundsSurvived:      uint(averageRoundsSurvived),
-		EarliestBankruptcyRound:    earliestBankruptcyRound,
+		EarliestBankruptcyRound:    s.earliestBankruptcyRound,
 		HighestProfitPercentage:    s.highestProfitPercentage,
 		OneCreditPercentageOfTotal: oneCreditPercentageOfTotal,
 		StartingCredits:            s.startingBankCredits,
@@ -130,6 +130,9 @@ func (s *Simulator) simulateRound() error {
 
 		s.lastCreditRound = s.currentRound
 		s.creditAtRound = append(s.creditAtRound, roundsSinceLastCredit)
+		if roundsSinceLastCredit < s.earliestBankruptcyRound {
+			s.earliestBankruptcyRound = roundsSinceLastCredit
+		}
 	}
 
 	if s.players[0].Credits >= s.BankAtCredits {
@@ -182,21 +185,6 @@ func (s *Simulator) withdrawFromBank() {
 
 	s.logger.Debug("withdrew", zap.Uint64("credits", amount), zap.Uint("round", s.currentRound))
 	s.numberOfWithdrawals++
-}
-
-func (s *Simulator) calculateEarliestBankruptcyRound() (uint, uint64) {
-	totalRounds := uint64(0)
-	earliestBankruptcyRound := s.currentRound
-
-	for j := range s.creditAtRound {
-		if s.creditAtRound[j] != 0 && s.creditAtRound[j] < earliestBankruptcyRound {
-			earliestBankruptcyRound = s.creditAtRound[j]
-		}
-
-		totalRounds += uint64(s.creditAtRound[j])
-	}
-
-	return earliestBankruptcyRound, totalRounds
 }
 
 func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPlayer {
