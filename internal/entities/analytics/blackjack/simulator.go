@@ -84,7 +84,7 @@ func (s *Simulator) Simulate() error {
 	s.logRuntimeStatistics(totalDurationTextual, averageRoundDuration, roundsPerSecond)
 
 	averageRoundsSurvived := float64(s.currentRound) / float64(len(s.creditAtRound))
-	oneCreditPercentageOfTotal := float64(s.OneCreditAmount) / float64(s.StartingCredits)
+	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfTotal()
 
 	res := models.SimulationResults{
 		AverageRoundsSurvived:      uint(averageRoundsSurvived),
@@ -95,7 +95,7 @@ func (s *Simulator) Simulate() error {
 		EndingCredits:              s.BankCredits,
 		RebuyCredits:               s.StartingCredits,
 		BankAtCredits:              s.BankAtCredits,
-		Score:                      float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(averageRoundsSurvived) * float64(oneCreditPercentageOfTotal),
+		Score:                      float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(averageRoundsSurvived) * oneCreditPercentageOfTotal,
 	}
 
 	s.logger.Info("strategy results", zap.Any("results", res))
@@ -252,4 +252,8 @@ func (s *Simulator) getDepositPercentage() float64 {
 	}
 
 	return float64(s.numberOfDeposits) / float64(s.numberOfWithdrawals)
+}
+
+func (s *Simulator) getOneCreditPercentageOfTotal() float64 {
+	return float64(s.OneCreditAmount) / float64(s.StartingCredits)
 }
