@@ -97,5 +97,5 @@ func (d *Deck) Log(logger *zap.Logger) {
 }
 
 func (d *Deck) IsFinished() bool {
-	return len(d.ActiveCards) == 0
+	return len(d.ActiveCards) == 0 && len(d.BurntCards) > 0
 }

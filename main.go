@@ -2,18 +2,20 @@ package main
 
 import (
 	"fmt"
+	"scrub/internal/config"
 	blackjackanalytics "scrub/internal/entities/analytics/blackjack"
 	"scrub/internal/entities/blackjack/bettingstrategy"
+	"scrub/internal/utils"
 
 	"go.uber.org/zap"
 )
 
 func main() {
-	config := zap.NewProductionConfig()
-	config.DisableCaller = true
-	config.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
+	zapConfig := zap.NewProductionConfig()
+	zapConfig.DisableCaller = true
+	zapConfig.Level = zap.NewAtomicLevelAt(utils.ParseZapLevel(config.LogLevel))
 
-	logger, err := config.Build()
+	logger, err := zapConfig.Build()
 	if err != nil {
 		panic(fmt.Sprintf("failed to init zap: %s ", err.Error()))
 	}

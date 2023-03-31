@@ -6,7 +6,7 @@ import (
 )
 
 func (d *Deck) Shuffle() {
-	d.RestoreBurnt()
+	d.RestoreBurntCards()
 
 	for i := range d.ActiveCards {
 		rand.New(rand.NewSource(time.Now().UnixNano()))
