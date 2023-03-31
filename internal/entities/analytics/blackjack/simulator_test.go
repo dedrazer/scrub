@@ -104,10 +104,22 @@ func TestSimulator_getTextualDuration(t *testing.T) {
 	}
 }
 
-func TestSimulator_getOneCreditPercentageOfTotal(t *testing.T) {
+func TestSimulator_getScore(t *testing.T) {
+	testSimulator.highestProfitPercentage = 3.14
+	testSimulator.numberOfDeposits = 56
+	testSimulator.numberOfWithdrawals = 13
+	testSimulator.averageRoundsSurvived = 21
+	testSimulator.OneCreditAmount = 50
+	testSimulator.StartingCredits = 100
+
+	actual := testSimulator.getScore()
+	require.Equal(t, 142.02, actual)
+}
+
+func TestSimulator_getOneCreditPercentageOfStartingCredits(t *testing.T) {
 	testSimulator.OneCreditAmount = 9
 	testSimulator.StartingCredits = 100
-	actual := testSimulator.getOneCreditPercentageOfTotal()
+	actual := testSimulator.getOneCreditPercentageOfStartingCredits()
 
 	require.Equal(t, float64(0.09), actual)
 }

@@ -7,6 +7,7 @@ import (
 	"scrub/internal/entities/blackjack/bettingstrategy"
 	"scrub/internal/entities/player"
 	"scrub/internal/errors"
+	"scrub/internal/utils"
 	"time"
 
 	"go.uber.org/zap"
@@ -199,7 +200,7 @@ func (s *Simulator) hasPositiveBalance() bool {
 }
 
 func (s *Simulator) getSimulationResults() models.SimulationResults {
-	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfTotal()
+	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfStartingCredits()
 	return models.SimulationResults{
 		AverageRoundsSurvived:      uint(s.averageRoundsSurvived),
 		EarliestBankruptcyRound:    s.earliestBankruptcyRound,
@@ -211,10 +212,6 @@ func (s *Simulator) getSimulationResults() models.SimulationResults {
 		BankAtCredits:              s.BankAtCredits,
 		Score:                      s.getScore(),
 	}
-}
-
-func (s *Simulator) getScore() float64 {
-	return float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(s.averageRoundsSurvived) * s.getOneCreditPercentageOfTotal()
 }
 
 func (s *Simulator) getTextualDuration(totalDurationMs int64) string {
@@ -233,6 +230,11 @@ func (s *Simulator) getTextualDuration(totalDurationMs int64) string {
 	return fmt.Sprintf("%.2fhrs", float64(totalDurationMs)/3600000)
 }
 
+func (s *Simulator) getScore() float64 {
+	score := float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(s.averageRoundsSurvived) * s.getOneCreditPercentageOfStartingCredits()
+	return utils.Round(score, 2)
+}
+
 func (s *Simulator) getDepositPercentage() float64 {
 	if s.numberOfWithdrawals == 0 {
 		return 1
@@ -241,6 +243,6 @@ func (s *Simulator) getDepositPercentage() float64 {
 	return float64(s.numberOfDeposits) / float64(s.numberOfWithdrawals)
 }
 
-func (s *Simulator) getOneCreditPercentageOfTotal() float64 {
+func (s *Simulator) getOneCreditPercentageOfStartingCredits() float64 {
 	return float64(s.OneCreditAmount) / float64(s.StartingCredits)
 }
