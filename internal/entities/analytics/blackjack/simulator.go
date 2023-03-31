@@ -37,6 +37,7 @@ type Simulator struct {
 	lastCreditRound         uint
 	creditAtRound           []uint
 	earliestBankruptcyRound uint
+	averageRoundsSurvived   float64
 	SimulationConfig
 }
 
@@ -83,20 +84,9 @@ func (s *Simulator) Simulate() error {
 
 	s.logRuntimeStatistics(totalDurationTextual, averageRoundDuration, roundsPerSecond)
 
-	averageRoundsSurvived := float64(s.currentRound) / float64(len(s.creditAtRound))
-	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfTotal()
+	s.averageRoundsSurvived = float64(s.currentRound) / float64(len(s.creditAtRound))
 
-	res := models.SimulationResults{
-		AverageRoundsSurvived:      uint(averageRoundsSurvived),
-		EarliestBankruptcyRound:    s.earliestBankruptcyRound,
-		HighestProfitPercentage:    s.highestProfitPercentage,
-		OneCreditPercentageOfTotal: oneCreditPercentageOfTotal,
-		StartingCredits:            s.startingBankCredits,
-		EndingCredits:              s.BankCredits,
-		RebuyCredits:               s.StartingCredits,
-		BankAtCredits:              s.BankAtCredits,
-		Score:                      float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(averageRoundsSurvived) * oneCreditPercentageOfTotal,
-	}
+	res := s.getSimulationResults()
 
 	s.logger.Info("strategy results", zap.Any("results", res))
 
@@ -206,6 +196,25 @@ func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPla
 
 func (s *Simulator) hasPositiveBalance() bool {
 	return s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)
+}
+
+func (s *Simulator) getSimulationResults() models.SimulationResults {
+	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfTotal()
+	return models.SimulationResults{
+		AverageRoundsSurvived:      uint(s.averageRoundsSurvived),
+		EarliestBankruptcyRound:    s.earliestBankruptcyRound,
+		HighestProfitPercentage:    s.highestProfitPercentage,
+		OneCreditPercentageOfTotal: oneCreditPercentageOfTotal,
+		StartingCredits:            s.startingBankCredits,
+		EndingCredits:              s.BankCredits,
+		RebuyCredits:               s.StartingCredits,
+		BankAtCredits:              s.BankAtCredits,
+		Score:                      s.getScore(),
+	}
+}
+
+func (s *Simulator) getScore() float64 {
+	return float64(s.highestProfitPercentage) * s.getDepositPercentage() * float64(s.averageRoundsSurvived) * s.getOneCreditPercentageOfTotal()
 }
 
 func (s *Simulator) getTextualDuration(totalDurationMs int64) string {
