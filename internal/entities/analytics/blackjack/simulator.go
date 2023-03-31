@@ -2,9 +2,9 @@ package blackjackanalytics
 
 import (
 	"fmt"
+	"scrub/internal/entities/analytics/blackjack/models"
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/blackjack/bettingstrategy"
-	"scrub/internal/entities/blackjack/models"
 	"scrub/internal/entities/player"
 	"scrub/internal/errors"
 	"time"

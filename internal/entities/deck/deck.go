@@ -70,6 +70,20 @@ func NewDeck() Deck {
 	return Deck{ActiveCards: res, BurntCards: []Card{}}
 }
 
+func NewShuffledDecks(numberOfDecks uint) Deck {
+	var shuffledDecks Deck
+
+	for i := uint(0); i < numberOfDecks; i++ {
+		d := NewDeck()
+
+		shuffledDecks = Merge(&shuffledDecks, &d)
+	}
+
+	shuffledDecks.Shuffle()
+
+	return shuffledDecks
+}
+
 func NewDeckByCards(cards []Card) Deck {
 	return Deck{ActiveCards: cards, BurntCards: []Card{}}
 }

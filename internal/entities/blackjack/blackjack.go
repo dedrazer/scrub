@@ -21,15 +21,7 @@ type BlackjackStatistics struct {
 }
 
 func NewBlackjack(numberOfDecks uint) *Blackjack {
-	var finalDeck deck.Deck
-
-	for i := uint(0); i < numberOfDecks; i++ {
-		d := deck.NewDeck()
-
-		finalDeck = deck.Merge(&finalDeck, &d)
-	}
-
-	finalDeck.Shuffle()
+	finalDeck := deck.NewShuffledDecks(numberOfDecks)
 
 	return &Blackjack{
 		deck:          &finalDeck,
