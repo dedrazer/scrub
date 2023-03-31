@@ -45,6 +45,65 @@ func TestMain(m *testing.M) {
 	os.Exit(runCode)
 }
 
+func TestSimulator_getTextualDuration(t *testing.T) {
+	type testCase struct {
+		name            string
+		inputDurationMs int64
+		expected        string
+	}
+
+	testCases := []testCase{
+		{
+			name:            "Zero",
+			inputDurationMs: 0,
+			expected:        "0ms",
+		},
+		{
+			name:            "Seconds",
+			inputDurationMs: 1000,
+			expected:        "1.00sec",
+		},
+		{
+			name:            "Minutes",
+			inputDurationMs: 60000,
+			expected:        "1.00min",
+		},
+		{
+			name:            "Hours",
+			inputDurationMs: 3600000,
+			expected:        "1.00hrs",
+		},
+		{
+			name:            "FractionalSeconds",
+			inputDurationMs: 1234,
+			expected:        "1.23sec",
+		},
+		{
+			name:            "FractionalMinutes",
+			inputDurationMs: 123456,
+			expected:        "2.06min",
+		},
+		{
+			name:            "FractionalHours",
+			inputDurationMs: 12345678,
+			expected:        "3.43hrs",
+		},
+		{
+			name:            "Negative",
+			inputDurationMs: -1000,
+			expected:        "-1000ms",
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			actual := testSimulator.getTextualDuration(tc.inputDurationMs)
+
+			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
 func TestSimulator_getOneCreditPercentageOfTotal(t *testing.T) {
 	testSimulator.OneCreditAmount = 9
 	testSimulator.StartingCredits = 100

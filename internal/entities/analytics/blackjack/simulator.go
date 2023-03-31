@@ -230,7 +230,7 @@ func (s *Simulator) getTextualDuration(totalDurationMs int64) string {
 		return fmt.Sprintf("%.2fmin", float64(totalDurationMs)/60000)
 	}
 
-	return fmt.Sprintf("%.2fh", float64(totalDurationMs)/3600000)
+	return fmt.Sprintf("%.2fhrs", float64(totalDurationMs)/3600000)
 }
 
 func (s *Simulator) getDepositPercentage() float64 {
