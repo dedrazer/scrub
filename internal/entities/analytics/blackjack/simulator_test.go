@@ -3,6 +3,7 @@ package blackjackanalytics
 import (
 	"fmt"
 	"os"
+	"scrub/internal/entities/analytics/blackjack/models"
 	"scrub/internal/entities/blackjack/bettingstrategy"
 	internalTesting "scrub/internal/testing"
 	"testing"
@@ -43,6 +44,33 @@ func TestMain(m *testing.M) {
 	runCode := m.Run()
 
 	os.Exit(runCode)
+}
+
+func TestSimulator_getSimulationResults(t *testing.T) {
+	testSimulator.OneCreditAmount = 10
+	testSimulator.startingBankCredits = 1000
+	testSimulator.StartingCredits = 100
+	testSimulator.averageRoundsSurvived = 31
+	testSimulator.earliestBankruptcyRound = 5
+	testSimulator.highestProfitPercentage = 3.14
+	testSimulator.BankCredits = 800
+	testSimulator.BankAtCredits = 100
+
+	expected := models.SimulationResults{
+		AverageRoundsSurvived:      31,
+		EarliestBankruptcyRound:    5,
+		HighestProfitPercentage:    3.14,
+		OneCreditPercentageOfTotal: 0.1,
+		StartingCredits:            1000,
+		EndingCredits:              800,
+		RebuyCredits:               100,
+		BankAtCredits:              100,
+		Score:                      9.73,
+	}
+
+	actual := testSimulator.getSimulationResults()
+
+	require.Equal(t, expected, actual)
 }
 
 func TestSimulator_getTextualDuration(t *testing.T) {
