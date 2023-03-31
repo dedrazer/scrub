@@ -20,8 +20,6 @@ func main() {
 		panic(fmt.Sprintf("failed to init zap: %s ", err.Error()))
 	}
 
-	//deck.Demo(logger)
-	//blackjack.Demo(logger)
 	simulationConfig := blackjackanalytics.SimulationConfig{
 		MaxRounds:       100000,
 		Decks:           6,
