@@ -1,8 +1,10 @@
 package blackjackanalytics
 
 import (
+	"fmt"
 	"os"
 	"scrub/internal/entities/blackjack/bettingstrategy"
+	internalTesting "scrub/internal/testing"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -49,4 +51,51 @@ func TestSimulator_getOneCreditPercentageOfTotal(t *testing.T) {
 	actual := testSimulator.getOneCreditPercentageOfTotal()
 
 	require.Equal(t, float64(0.09), actual)
+}
+
+func TestSimulator_getDepositPercentage(t *testing.T) {
+	type testCase struct {
+		name                     string
+		inputNumberOfDeposits    uint
+		inputNumberOfWithdrawals uint
+		expected                 float64
+	}
+
+	testCases := []testCase{
+		{
+			name:                     "ZeroWithdrawals DivByZeroCheck",
+			inputNumberOfDeposits:    2,
+			inputNumberOfWithdrawals: 0,
+			expected:                 1,
+		},
+		{
+			name:                     "ZeroDeposits",
+			inputNumberOfDeposits:    0,
+			inputNumberOfWithdrawals: 1,
+			expected:                 0,
+		},
+		{
+			name:                     "Normal Loss",
+			inputNumberOfDeposits:    2,
+			inputNumberOfWithdrawals: 6,
+			expected:                 float64(2) / 6,
+		},
+		{
+			name:                     "Normal Profit",
+			inputNumberOfDeposits:    5,
+			inputNumberOfWithdrawals: 3,
+			expected:                 float64(5) / 3,
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			testSimulator.numberOfDeposits = tc.inputNumberOfDeposits
+			testSimulator.numberOfWithdrawals = tc.inputNumberOfWithdrawals
+
+			actual := testSimulator.getDepositPercentage()
+
+			require.Equal(t, tc.expected, actual)
+		})
+	}
 }
