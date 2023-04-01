@@ -49,6 +49,16 @@ func TestMain(m *testing.M) {
 	os.Exit(runCode)
 }
 
+func TestSimulator_rebuy_ErrorNoRebuysRemaining(t *testing.T) {
+	testSimulator.RebuyCount = 0
+	err := testSimulator.rebuy()
+	require.EqualError(t, err, "no rebuys remaining")
+
+	testSimulator.RebuyCount = 1
+	err = testSimulator.rebuy()
+	require.NoError(t, err)
+}
+
 func TestSimulator_withdrawFromBank(t *testing.T) {
 	type testCase struct {
 		name                     string
