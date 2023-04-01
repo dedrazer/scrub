@@ -2,13 +2,13 @@ package deck
 
 import (
 	"math/rand"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 	"time"
 )
 
 func (d *Deck) TakeCardByIndex(index int) (*Card, error) {
 	if index >= len(d.ActiveCards) {
-		return nil, errors.ErrIndexOutOfRange
+		return nil, errorutils.ErrIndexOutOfRange
 	}
 
 	res := d.ActiveCards[index]
@@ -20,7 +20,7 @@ func (d *Deck) TakeCardByIndex(index int) (*Card, error) {
 
 func (d *Deck) TakeRandomCard() (*Card, error) {
 	if len(d.ActiveCards) == 0 {
-		return nil, errors.ErrActiveCardsIsEmpty
+		return nil, errorutils.ErrActiveCardsIsEmpty
 	}
 
 	rand.Seed(time.Now().UnixNano())

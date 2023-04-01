@@ -1,11 +1,12 @@
 package blackjackanalytics
 
 import (
+	"errors"
 	"fmt"
 	"scrub/internal/entities/analytics/blackjack/models"
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/blackjack/bettingstrategy"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 	"scrub/internal/utils"
 	"time"
 
@@ -34,7 +35,7 @@ type Simulator struct {
 	numberOfDeposits        uint
 	numberOfWithdrawals     uint
 	currentRound            uint
-	lastCreditRound         uint
+	lastRebuyRound          uint
 	creditAtRound           []uint
 	earliestBankruptcyRound uint
 	averageRoundsSurvived   float64
@@ -48,7 +49,7 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 		startingTime:            time.Now().UTC(),
 		startingRebuyCount:      config.RebuyCount,
 		startingBankCredits:     config.BankCredits,
-		lastCreditRound:         uint(0),
+		lastRebuyRound:          uint(0),
 		creditAtRound:           make([]uint, 1),
 		earliestBankruptcyRound: config.MaxRounds,
 		highestProfitPercentage: float64(1),
@@ -97,7 +98,7 @@ func (s *Simulator) simulateRounds() error {
 	for s.currentRound < s.MaxRounds && s.hasRemainingBalance() {
 		err := s.simulateRound()
 		if err != nil {
-			return errors.ErrFailedSubMethod("simulateRound", err)
+			return errorutils.ErrFailedSubMethod("simulateRound", err)
 		}
 
 		s.currentRound++
@@ -110,18 +111,9 @@ func (s *Simulator) simulateRound() error {
 	s.logger.Debug("starting round", zap.Uint("round", s.currentRound))
 
 	if s.players[0].Credits == 0 {
-		roundsSinceLastCredit := s.currentRound - s.lastCreditRound
-
-		s.withdrawFromBank()
-
-		s.players[0].Hands[0].BetAmount = s.OneCreditAmount
-		s.RebuyCount--
-		s.logger.Debug("player rebuy", zap.Int("rebuys remaining", s.RebuyCount))
-
-		s.lastCreditRound = s.currentRound
-		s.creditAtRound = append(s.creditAtRound, roundsSinceLastCredit)
-		if roundsSinceLastCredit < s.earliestBankruptcyRound {
-			s.earliestBankruptcyRound = roundsSinceLastCredit
+		err := s.rebuy()
+		if err != nil {
+			return errorutils.ErrFailedSubMethod("rebuy", err)
 		}
 	}
 
@@ -139,7 +131,7 @@ func (s *Simulator) simulateRound() error {
 
 	err := s.bettingStrategy.Strategy(s.players)
 	if err != nil {
-		return errors.ErrFailedSubMethod("bettingStrategy", err)
+		return errorutils.ErrFailedSubMethod("bettingStrategy", err)
 	}
 
 	if s.players[0].Hands[0].BetAmount > s.players[0].Credits {
@@ -148,12 +140,34 @@ func (s *Simulator) simulateRound() error {
 
 	dealerHand, err := s.blackjackEngine.DealRound(s.players)
 	if err != nil {
-		return errors.ErrFailedSubMethod("DealRound", err)
+		return errorutils.ErrFailedSubMethod("DealRound", err)
 	}
 
 	err = s.blackjackEngine.Play(s.logger, s.players, dealerHand, blackjack.Strategy)
 	if err != nil {
-		return errors.ErrFailedSubMethod("Play", err)
+		return errorutils.ErrFailedSubMethod("Play", err)
+	}
+
+	return nil
+}
+
+func (s *Simulator) rebuy() error {
+	if s.RebuyCount < 1 {
+		return errors.New("no rebuys remaining")
+	}
+
+	roundsSinceLastRebuy := s.currentRound - s.lastRebuyRound
+
+	s.withdrawFromBank()
+
+	s.players[0].Hands[0].BetAmount = s.OneCreditAmount
+	s.RebuyCount--
+	s.logger.Debug("player rebuy", zap.Int("rebuys remaining", s.RebuyCount))
+
+	s.lastRebuyRound = s.currentRound
+	s.creditAtRound = append(s.creditAtRound, roundsSinceLastRebuy)
+	if roundsSinceLastRebuy < s.earliestBankruptcyRound {
+		s.earliestBankruptcyRound = roundsSinceLastRebuy
 	}
 
 	return nil

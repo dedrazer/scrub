@@ -1,7 +1,7 @@
 package deck
 
 import (
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +36,7 @@ func TestDeck_TakeCardByIndex(t *testing.T) {
 		{
 			name:          "Err Index Out Of Range",
 			indexes:       []int{52},
-			expectedError: errors.ErrIndexOutOfRange,
+			expectedError: errorutils.ErrIndexOutOfRange,
 		},
 		{
 			name:    "OK Multiple Cards",

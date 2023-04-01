@@ -2,13 +2,13 @@ package deck
 
 import (
 	"math/rand"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 	"time"
 )
 
 func (d *Deck) GetCardByIndex(index int) (*Card, error) {
 	if index >= len(d.ActiveCards) {
-		return nil, errors.ErrIndexOutOfRange
+		return nil, errorutils.ErrIndexOutOfRange
 	}
 
 	return &d.ActiveCards[index], nil

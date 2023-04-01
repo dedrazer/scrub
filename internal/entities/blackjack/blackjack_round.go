@@ -2,7 +2,7 @@ package blackjack
 
 import (
 	"scrub/internal/entities/deck"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 )
 
 func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand, err error) {
@@ -21,7 +21,7 @@ func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand
 	// Deal first card to each player
 	err = bj.DealRoundOfCards(players)
 	if err != nil {
-		return dealerHand, errors.ErrFailedSubMethod("DealRoundOfCards", err)
+		return dealerHand, errorutils.ErrFailedSubMethod("DealRoundOfCards", err)
 	}
 
 	dealerHand.cards = make([]deck.Card, 2)
@@ -29,7 +29,7 @@ func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand
 	// Deal down card to dealer
 	dealerCardDown, err := bj.DealCard()
 	if err != nil {
-		return dealerHand, errors.ErrFailedSubMethod("DealCard (dealer down)", err)
+		return dealerHand, errorutils.ErrFailedSubMethod("DealCard (dealer down)", err)
 	}
 
 	dealerHand.cards[0] = *dealerCardDown
@@ -37,13 +37,13 @@ func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand
 	// Deal second card to each player
 	err = bj.DealRoundOfCards(players)
 	if err != nil {
-		return dealerHand, errors.ErrFailedSubMethod("DealRoundOfCards", err)
+		return dealerHand, errorutils.ErrFailedSubMethod("DealRoundOfCards", err)
 	}
 
 	// Deal up card to dealer
 	dealerCardUp, err := bj.DealCard()
 	if err != nil {
-		return dealerHand, errors.ErrFailedSubMethod("DealCard (dealer up)", err)
+		return dealerHand, errorutils.ErrFailedSubMethod("DealCard (dealer up)", err)
 	}
 
 	dealerHand.cards[1] = *dealerCardUp

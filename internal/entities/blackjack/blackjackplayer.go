@@ -3,7 +3,7 @@ package blackjack
 import (
 	"errors"
 	"scrub/internal/entities/player"
-	internalErrors "scrub/internal/errors"
+	"scrub/internal/errorutils"
 
 	"go.uber.org/zap"
 )
@@ -16,7 +16,7 @@ type BlackjackPlayer struct {
 func (bjp *BlackjackPlayer) PrintResult(logger *zap.Logger) error {
 	for i, h := range bjp.Hands {
 		if h.Result == nil {
-			return internalErrors.ErrUnexpectedNil
+			return errorutils.ErrUnexpectedNil
 		}
 		logger.Debug("player result",
 			zap.String("player", bjp.Player.Name),

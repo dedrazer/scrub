@@ -2,7 +2,7 @@ package player
 
 import (
 	"fmt"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 
 	"go.uber.org/zap"
 )
@@ -28,7 +28,7 @@ func (p *Player) Win(amount uint64) {
 
 func (p *Player) Lose(amount uint64) error {
 	if p.Credits < amount {
-		return errors.ErrInsufficientCredits
+		return errorutils.ErrInsufficientCredits
 	}
 
 	p.Credits -= amount

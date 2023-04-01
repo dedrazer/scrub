@@ -2,7 +2,7 @@ package blackjack
 
 import (
 	"scrub/internal/entities/deck"
-	"scrub/internal/errors"
+	"scrub/internal/errorutils"
 
 	"go.uber.org/zap"
 )
@@ -29,7 +29,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 		for i, p := range players {
 			for j := range p.Hands {
 				if players[i].Hands[j].BetAmount > players[i].Credits {
-					return errors.ErrInsufficientCredits
+					return errorutils.ErrInsufficientCredits
 				}
 
 				logger.Debug("bet info", zap.Uint64("amount", players[i].Hands[j].BetAmount))
@@ -51,7 +51,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 
 							bj.SplitCount++
 						} else {
-							return errors.ErrCannotSplit
+							return errorutils.ErrCannotSplit
 						}
 					}
 				}
@@ -87,7 +87,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 					}
 
 					if !validInput {
-						return errors.ErrInvalidInput(action)
+						return errorutils.ErrInvalidInput(action)
 					}
 
 					if action == double {
@@ -97,7 +97,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 						)
 						c, err = bj.DealCard()
 						if err != nil {
-							return errors.ErrFailedSubMethod("DealCard", err)
+							return errorutils.ErrFailedSubMethod("DealCard", err)
 						}
 
 						players[i].Hands[j].Double()
@@ -116,7 +116,7 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 						)
 						c, err = bj.DealCard()
 						if err != nil {
-							return errors.ErrFailedSubMethod("DealCard", err)
+							return errorutils.ErrFailedSubMethod("DealCard", err)
 						}
 
 						players[i].Hands[j].AddCard(*c)
@@ -132,16 +132,16 @@ func (bj *Blackjack) Play(logger *zap.Logger, players []BlackjackPlayer, dealerH
 	}
 
 	if err := bj.Results(logger, players, dealerHand); err != nil {
-		return errors.ErrFailedSubMethod("Results", err)
+		return errorutils.ErrFailedSubMethod("Results", err)
 	}
 
 	if err := PrintAllResults(logger, players); err != nil {
-		return errors.ErrFailedSubMethod("PrintAllResults", err)
+		return errorutils.ErrFailedSubMethod("PrintAllResults", err)
 	}
 
 	for i := range players {
 		if err := players[i].ResetHands(); err != nil {
-			return errors.ErrFailedSubMethod("ResetHands", err)
+			return errorutils.ErrFailedSubMethod("ResetHands", err)
 		}
 	}
 

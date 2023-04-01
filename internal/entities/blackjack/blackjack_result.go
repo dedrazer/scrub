@@ -3,7 +3,7 @@ package blackjack
 import (
 	"errors"
 	"scrub/internal/entities/blackjack/utils"
-	internalErrors "scrub/internal/errors"
+	"scrub/internal/errorutils"
 
 	"go.uber.org/zap"
 )
@@ -13,7 +13,7 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 
 	err := bj.DrawDealerCards(logger, &dealerHand)
 	if err != nil {
-		return internalErrors.ErrFailedSubMethod("DrawDealerCards", err)
+		return errorutils.ErrFailedSubMethod("DrawDealerCards", err)
 	}
 
 	dealerBust := false
@@ -87,7 +87,7 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 			case utils.Loss:
 				err = players[i].Lose(h.BetAmount)
 				if err != nil {
-					return internalErrors.ErrFailedSubMethod("Lose", err)
+					return errorutils.ErrFailedSubMethod("Lose", err)
 				}
 				if players[i].Credits == 0 {
 					players[i].Hands[j].Result = &utils.Bankrupt
