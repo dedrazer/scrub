@@ -5,7 +5,6 @@ import (
 	"scrub/internal/entities/analytics/blackjack/models"
 	"scrub/internal/entities/blackjack"
 	"scrub/internal/entities/blackjack/bettingstrategy"
-	"scrub/internal/entities/player"
 	"scrub/internal/errors"
 	"scrub/internal/utils"
 	"time"
@@ -60,7 +59,7 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 func (s *Simulator) Simulate() error {
 	s.logger.Info("starting simulation", zap.Any("config", s.SimulationConfig))
 
-	s.players = initTestPlayers(s.SimulationConfig)
+	s.players = getTestPlayers(s.SimulationConfig)
 
 	s.blackjackEngine = blackjack.NewBlackjack(s.SimulationConfig.Decks)
 
@@ -95,7 +94,7 @@ func (s *Simulator) Simulate() error {
 }
 
 func (s *Simulator) simulateRounds() error {
-	for s.currentRound < s.MaxRounds && s.hasPositiveBalance() {
+	for s.currentRound < s.MaxRounds && s.hasRemainingBalance() {
 		err := s.simulateRound()
 		if err != nil {
 			return errors.ErrFailedSubMethod("simulateRound", err)
@@ -178,27 +177,6 @@ func (s *Simulator) withdrawFromBank() {
 	s.numberOfWithdrawals++
 }
 
-func initTestPlayers(simulationConfig SimulationConfig) []blackjack.BlackjackPlayer {
-	return []blackjack.BlackjackPlayer{
-		{
-			Player: player.Player{
-				Name:            "Test Player",
-				StartingCredits: simulationConfig.StartingCredits,
-				Credits:         simulationConfig.StartingCredits,
-			},
-			Hands: []blackjack.Hand{
-				{
-					BetAmount: simulationConfig.OneCreditAmount,
-				},
-			},
-		},
-	}
-}
-
-func (s *Simulator) hasPositiveBalance() bool {
-	return s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)
-}
-
 func (s *Simulator) getSimulationResults() models.SimulationResults {
 	oneCreditPercentageOfTotal := s.getOneCreditPercentageOfStartingCredits()
 	return models.SimulationResults{
@@ -245,4 +223,8 @@ func (s *Simulator) getDepositPercentage() float64 {
 
 func (s *Simulator) getOneCreditPercentageOfStartingCredits() float64 {
 	return float64(s.OneCreditAmount) / float64(s.StartingCredits)
+}
+
+func (s *Simulator) hasRemainingBalance() bool {
+	return s.players[0].Credits > 0 || (s.RebuyCount > 0 && s.BankCredits > 0)
 }

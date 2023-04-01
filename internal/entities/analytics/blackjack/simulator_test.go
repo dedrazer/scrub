@@ -41,6 +41,9 @@ func TestMain(m *testing.M) {
 
 	testSimulator = NewSimulator(logger, testStrategy, testSimulationConfig)
 
+	testPlayers := getTestPlayers(testSimulationConfig)
+	testSimulator.players = testPlayers
+
 	runCode := m.Run()
 
 	os.Exit(runCode)
@@ -144,14 +147,6 @@ func TestSimulator_getScore(t *testing.T) {
 	require.Equal(t, 142.02, actual)
 }
 
-func TestSimulator_getOneCreditPercentageOfStartingCredits(t *testing.T) {
-	testSimulator.OneCreditAmount = 9
-	testSimulator.StartingCredits = 100
-	actual := testSimulator.getOneCreditPercentageOfStartingCredits()
-
-	require.Equal(t, float64(0.09), actual)
-}
-
 func TestSimulator_getDepositPercentage(t *testing.T) {
 	type testCase struct {
 		name                     string
@@ -193,6 +188,81 @@ func TestSimulator_getDepositPercentage(t *testing.T) {
 			testSimulator.numberOfWithdrawals = tc.inputNumberOfWithdrawals
 
 			actual := testSimulator.getDepositPercentage()
+
+			require.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
+func TestSimulator_getOneCreditPercentageOfStartingCredits(t *testing.T) {
+	testSimulator.OneCreditAmount = 9
+	testSimulator.StartingCredits = 100
+	actual := testSimulator.getOneCreditPercentageOfStartingCredits()
+
+	require.Equal(t, float64(0.09), actual)
+}
+
+func TestSimulator_hasRemainingBalance(t *testing.T) {
+	type testCase struct {
+		name               string
+		inputPlayerCredits uint64
+		inputRebuyCount    int
+		inputBankCredits   uint64
+		expected           bool
+	}
+
+	testCases := []testCase{
+		{
+			name:               "NothingLeft",
+			inputPlayerCredits: 0,
+			inputRebuyCount:    0,
+			inputBankCredits:   0,
+			expected:           false,
+		},
+		{
+			name:               "HasRebuy",
+			inputPlayerCredits: 0,
+			inputRebuyCount:    1,
+			inputBankCredits:   0,
+			expected:           false,
+		},
+		{
+			name:               "HasBankedCredits",
+			inputPlayerCredits: 0,
+			inputRebuyCount:    0,
+			inputBankCredits:   1,
+			expected:           false,
+		},
+		{
+			name:               "HasRebuyAndBankedCredits",
+			inputPlayerCredits: 0,
+			inputRebuyCount:    1,
+			inputBankCredits:   1,
+			expected:           true,
+		},
+		{
+			name:               "HasCredits",
+			inputPlayerCredits: 1,
+			inputRebuyCount:    0,
+			inputBankCredits:   0,
+			expected:           true,
+		},
+		{
+			name:               "HasEverything",
+			inputPlayerCredits: 1,
+			inputRebuyCount:    1,
+			inputBankCredits:   1,
+			expected:           true,
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			testSimulator.players[0].Credits = tc.inputPlayerCredits
+			testSimulator.RebuyCount = tc.inputRebuyCount
+			testSimulator.BankCredits = tc.inputBankCredits
+
+			actual := testSimulator.hasRemainingBalance()
 
 			require.Equal(t, tc.expected, actual)
 		})
