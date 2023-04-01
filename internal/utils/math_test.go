@@ -2,9 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"scrub/internal/testutils"
 	"testing"
 
-	"github.com/fasttrack-solutions/altenar-transformer/pkg/testutils"
 	"github.com/stretchr/testify/require"
 )
 
