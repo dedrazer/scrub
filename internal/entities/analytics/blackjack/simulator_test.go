@@ -127,6 +127,23 @@ func TestSimulator_depositExcessIntoBank(t *testing.T) {
 	require.Equal(t, uint64(95), testSimulator.players[0].Credits)
 }
 
+func TestSimulator_recalculateHighestProfitPercentage(t *testing.T) {
+	testSimulator.highestProfitPercentage = 1.2
+	testSimulator.StartingCredits = 100
+	testSimulator.players[0].Credits = 125
+
+	actual := testSimulator.recalculateHighestProfitPercentage()
+
+	require.Equal(t, 1.25, actual)
+
+	testSimulator.highestProfitPercentage = 1.2
+	testSimulator.players[0].Credits = 115
+
+	actual = testSimulator.recalculateHighestProfitPercentage()
+
+	require.Equal(t, 1.2, actual)
+}
+
 func TestSimulator_getSimulationResults(t *testing.T) {
 	testSimulator.OneCreditAmount = 10
 	testSimulator.startingBankCredits = 1000
