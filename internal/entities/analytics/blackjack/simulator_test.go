@@ -103,6 +103,30 @@ func TestSimulator_withdrawFromBank(t *testing.T) {
 	}
 }
 
+func TestSimulator_depositExcessIntoBank(t *testing.T) {
+	testSimulator.BankCredits = 800
+	testSimulator.numberOfDeposits = 12
+	testSimulator.players[0].Credits = 205
+	testSimulator.StartingCredits = 100
+
+	testSimulator.depositExcessIntoBank()
+
+	require.Equal(t, uint64(905), testSimulator.BankCredits)
+	require.Equal(t, uint(13), testSimulator.numberOfDeposits)
+	require.Equal(t, uint64(100), testSimulator.players[0].Credits)
+
+	testSimulator.BankCredits = 800
+	testSimulator.numberOfDeposits = 12
+	testSimulator.players[0].Credits = 95
+	testSimulator.StartingCredits = 100
+
+	testSimulator.depositExcessIntoBank()
+
+	require.Equal(t, uint64(800), testSimulator.BankCredits)
+	require.Equal(t, uint(12), testSimulator.numberOfDeposits)
+	require.Equal(t, uint64(95), testSimulator.players[0].Credits)
+}
+
 func TestSimulator_getSimulationResults(t *testing.T) {
 	testSimulator.OneCreditAmount = 10
 	testSimulator.startingBankCredits = 1000
