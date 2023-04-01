@@ -132,14 +132,14 @@ func TestSimulator_recalculateHighestProfitPercentage(t *testing.T) {
 	testSimulator.StartingCredits = 100
 	testSimulator.players[0].Credits = 125
 
-	actual := testSimulator.recalculateHighestProfitPercentage()
+	actual := testSimulator.getHighestProfitPercentage()
 
 	require.Equal(t, 1.25, actual)
 
 	testSimulator.highestProfitPercentage = 1.2
 	testSimulator.players[0].Credits = 115
 
-	actual = testSimulator.recalculateHighestProfitPercentage()
+	actual = testSimulator.getHighestProfitPercentage()
 
 	require.Equal(t, 1.2, actual)
 }

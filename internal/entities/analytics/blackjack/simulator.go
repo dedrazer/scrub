@@ -119,7 +119,7 @@ func (s *Simulator) simulateRound() error {
 
 	s.depositExcessIntoBank()
 
-	s.highestProfitPercentage = s.recalculateHighestProfitPercentage()
+	s.highestProfitPercentage = s.getHighestProfitPercentage()
 
 	err := s.bettingStrategy.Strategy(s.players)
 	if err != nil {
@@ -191,7 +191,7 @@ func (s *Simulator) depositExcessIntoBank() {
 	}
 }
 
-func (s *Simulator) recalculateHighestProfitPercentage() float64 {
+func (s *Simulator) getHighestProfitPercentage() float64 {
 	profitPercentage := float64(s.players[0].Credits) / float64(s.StartingCredits)
 	if profitPercentage > s.highestProfitPercentage {
 		return profitPercentage
