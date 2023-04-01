@@ -5,7 +5,7 @@ import (
 	"os"
 	"scrub/internal/entities/analytics/blackjack/models"
 	"scrub/internal/entities/blackjack/bettingstrategy"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -49,6 +49,50 @@ func TestMain(m *testing.M) {
 	os.Exit(runCode)
 }
 
+func TestSimulator_withdrawFromBank(t *testing.T) {
+	type testCase struct {
+		name                     string
+		inputBankCredits         uint64
+		inputStartingCredits     uint64
+		inputPlayerCredits       uint64
+		expectedPlayerCreditGain uint64
+		expectedBankCredits      uint64
+	}
+
+	testCases := []testCase{
+		{
+			name:                     "PlayerEmpty Withdraw100",
+			inputBankCredits:         1000,
+			inputStartingCredits:     100,
+			expectedPlayerCreditGain: 100,
+			expectedBankCredits:      900,
+		},
+		{
+			name:                     "WithdrawAll",
+			inputBankCredits:         80,
+			inputStartingCredits:     100,
+			expectedPlayerCreditGain: 80,
+			expectedBankCredits:      0,
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			initialNumberOfWithdrawals := testSimulator.numberOfWithdrawals
+			initialPlayerCredits := testSimulator.players[0].Credits
+
+			testSimulator.BankCredits = tc.inputBankCredits
+			testSimulator.StartingCredits = tc.inputStartingCredits
+
+			testSimulator.withdrawFromBank()
+
+			require.Equal(t, initialNumberOfWithdrawals+1, testSimulator.numberOfWithdrawals)
+			require.Equal(t, initialPlayerCredits+tc.expectedPlayerCreditGain, testSimulator.players[0].Credits)
+			require.Equal(t, tc.expectedBankCredits, testSimulator.BankCredits)
+		})
+	}
+}
+
 func TestSimulator_getSimulationResults(t *testing.T) {
 	testSimulator.OneCreditAmount = 10
 	testSimulator.startingBankCredits = 1000
@@ -58,6 +102,8 @@ func TestSimulator_getSimulationResults(t *testing.T) {
 	testSimulator.highestProfitPercentage = 3.14
 	testSimulator.BankCredits = 800
 	testSimulator.BankAtCredits = 100
+	testSimulator.numberOfDeposits = 4
+	testSimulator.numberOfWithdrawals = 12
 
 	expected := models.SimulationResults{
 		AverageRoundsSurvived:      31,
@@ -68,7 +114,7 @@ func TestSimulator_getSimulationResults(t *testing.T) {
 		EndingCredits:              800,
 		RebuyCredits:               100,
 		BankAtCredits:              100,
-		Score:                      9.73,
+		Score:                      3.24,
 	}
 
 	actual := testSimulator.getSimulationResults()
@@ -127,7 +173,7 @@ func TestSimulator_getTextualDuration(t *testing.T) {
 	}
 
 	for tn, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			actual := testSimulator.getTextualDuration(tc.inputDurationMs)
 
 			require.Equal(t, tc.expected, actual)
@@ -183,7 +229,7 @@ func TestSimulator_getDepositPercentage(t *testing.T) {
 	}
 
 	for tn, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			testSimulator.numberOfDeposits = tc.inputNumberOfDeposits
 			testSimulator.numberOfWithdrawals = tc.inputNumberOfWithdrawals
 
@@ -257,7 +303,7 @@ func TestSimulator_hasRemainingBalance(t *testing.T) {
 	}
 
 	for tn, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			testSimulator.players[0].Credits = tc.inputPlayerCredits
 			testSimulator.RebuyCount = tc.inputRebuyCount
 			testSimulator.BankCredits = tc.inputBankCredits

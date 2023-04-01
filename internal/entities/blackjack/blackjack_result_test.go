@@ -5,7 +5,7 @@ import (
 	"scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
 	"scrub/internal/entities/player"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -143,7 +143,7 @@ func TestBlackjack_Result(t *testing.T) {
 	logger, err := zap.NewDevelopment()
 	require.NoError(t, err, "zap.NewDevelopment() setup error")
 	for i, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, i, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
 			bj := NewBlackjack(numberOfDecks)
 			err = bj.Results(logger, tc.inputPlayers, tc.inputDealerHand)
 

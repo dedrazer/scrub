@@ -3,7 +3,7 @@ package blackjack
 import (
 	"fmt"
 	"scrub/internal/entities/deck"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -89,7 +89,7 @@ func TestStrategy1(t *testing.T) {
 	playerCredits := uint64(1000)
 
 	for testNumber, testCase := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, testNumber, testCase.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, testNumber, testCase.name), func(t *testing.T) {
 			dealerHand := DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{

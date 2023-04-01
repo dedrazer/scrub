@@ -3,7 +3,7 @@ package blackjack
 import (
 	"fmt"
 	"scrub/internal/entities/deck"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,7 +42,7 @@ func TestHand_CanSplit(t *testing.T) {
 	playerCredits := uint64(1000)
 
 	for tn, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			actual := tc.input.CanSplit(playerCredits)
 			require.Equal(t, tc.expected, actual)
 		})
@@ -90,7 +90,7 @@ func TestHand_IsSoft(t *testing.T) {
 	}
 
 	for tn, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			actual := tc.input.IsSoft()
 			require.Equal(t, tc.expected, actual)
 		})

@@ -163,15 +163,14 @@ func (s *Simulator) withdrawFromBank() {
 	var amount uint64
 
 	if s.BankCredits >= s.StartingCredits {
-		s.players[0].Credits = s.StartingCredits
-		s.BankCredits -= s.StartingCredits
 		amount = s.StartingCredits
 	} else {
-		s.players[0].Credits = s.BankCredits
-		s.BankCredits = 0
+		amount = s.BankCredits
 		s.logger.Info("bank is out of credits", zap.Uint("round", s.currentRound))
-		amount = s.players[0].Credits
 	}
+
+	s.players[0].Credits += amount
+	s.BankCredits -= amount
 
 	s.logger.Debug("withdrew", zap.Uint64("credits", amount), zap.Uint("round", s.currentRound))
 	s.numberOfWithdrawals++

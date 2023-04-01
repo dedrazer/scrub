@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"scrub/internal/entities/deck"
 	"scrub/internal/entities/player"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -85,7 +85,7 @@ func TestBlackjack_Play(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, i, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
 			testBlackjack := NewBlackjack(10)
 
 			err = testBlackjack.Play(testLogger, tc.inputPlayers, tc.inputDealerHand, Strategy)

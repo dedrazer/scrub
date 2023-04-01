@@ -3,7 +3,7 @@ package blackjack
 import (
 	"fmt"
 	"scrub/internal/entities/deck"
-	internalTesting "scrub/internal/testing"
+	"scrub/internal/testutils"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -119,7 +119,7 @@ func TestBlackJackPlayer_ResetHands(t *testing.T) {
 	}
 
 	for testNumber, tc := range testCases {
-		t.Run(fmt.Sprintf(internalTesting.TestNameTemplate, testNumber, tc.name), func(t *testing.T) {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, testNumber, tc.name), func(t *testing.T) {
 			err := tc.input.ResetHands()
 			if tc.expectedError != nil {
 				require.Equal(t, tc.expectedError, err)
