@@ -121,11 +121,11 @@ func (s *Simulator) simulateRound() error {
 
 	s.highestProfitPercentage = s.getHighestProfitPercentage()
 
-	err := s.bettingStrategy.Strategy(s.players)
+	err := s.bettingStrategy.BettingStrategy(s.players)
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("bettingStrategy", err)
 	}
-
+	
 	if s.players[0].Hands[0].BetAmount > s.players[0].Credits {
 		s.players[0].Hands[0].BetAmount = s.players[0].Credits
 	}
@@ -135,7 +135,7 @@ func (s *Simulator) simulateRound() error {
 		return errorutils.ErrFailedSubMethod("DealRound", err)
 	}
 
-	err = s.blackjackEngine.Play(s.logger, s.players, dealerHand, blackjack.Strategy)
+	err = s.blackjackEngine.Play(s.logger, s.players, dealerHand, blackjack.PlayingStrategy)
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("Play", err)
 	}

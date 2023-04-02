@@ -8,7 +8,7 @@ import (
 
 type Strategy interface {
 	GetName() string
-	Strategy(players []blackjack.BlackjackPlayer) error
+	BettingStrategy(players []blackjack.BlackjackPlayer) error
 }
 
 func playerAllIn(logger *zap.Logger, player *blackjack.BlackjackPlayer, handNumber, round, lossStreak int, roundResult string) {

@@ -88,7 +88,7 @@ func TestBlackjack_Play(t *testing.T) {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
 			testBlackjack := NewBlackjack(10)
 
-			err = testBlackjack.Play(testLogger, tc.inputPlayers, tc.inputDealerHand, Strategy)
+			err = testBlackjack.Play(testLogger, tc.inputPlayers, tc.inputDealerHand, PlayingStrategy)
 
 			if tc.expectedErr != nil {
 				require.ErrorContains(t, tc.expectedErr, err.Error(), "error value")

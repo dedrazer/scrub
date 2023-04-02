@@ -10,7 +10,7 @@ type Martingale struct {
 	CommonStrategyVariables
 }
 
-func (m *Martingale) Strategy(players []blackjack.BlackjackPlayer) error {
+func (m *Martingale) BettingStrategy(players []blackjack.BlackjackPlayer) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {

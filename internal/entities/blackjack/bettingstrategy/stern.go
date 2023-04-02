@@ -11,7 +11,7 @@ type Stern struct {
 	CommonStrategyVariables
 }
 
-func (s *Stern) Strategy(players []blackjack.BlackjackPlayer) error {
+func (s *Stern) BettingStrategy(players []blackjack.BlackjackPlayer) error {
 	for i := range players {
 		for j := range players[i].Hands {
 			if players[i].Hands[j].Result == nil {

@@ -46,7 +46,7 @@ func Demo(logger *zap.Logger) {
 
 	dealerHand.DealerLog(logger)
 
-	err = testBlackjack.Play(logger, players, dealerHand, Strategy)
+	err = testBlackjack.Play(logger, players, dealerHand, PlayingStrategy)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}
