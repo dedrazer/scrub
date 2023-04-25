@@ -28,27 +28,11 @@ func (bj *Blackjack) DealCard() (*deck.Card, error) {
 // If the dealer has an ace, and counting it as 11 would bring the total to 17 or more (but not over 21),
 // the dealer must count the ace as 11 and stand.
 func (bj *Blackjack) DrawDealerCards(logger *zap.Logger, dh *DealerHand) error {
-	value := dh.Value()
-	if len(value) == 0 {
+	if dh.hasNoValue() {
 		return errors.New("no value")
 	}
 
-	if len(value) == 2 {
-		if value[1] < 17 {
-			c, err := bj.DealCard()
-			if err != nil {
-				logger.Error("failed to deal card", zap.Error(err))
-			}
-
-			dh.AddCard(*c)
-			return bj.DrawDealerCards(logger, dh)
-		}
-
-		dh.DealerResult(logger)
-		return nil
-	}
-
-	if value[0] < 17 {
+	if dh.shouldDraw() {
 		c, err := bj.DealCard()
 		if err != nil {
 			logger.Error("failed to deal card", zap.Error(err))

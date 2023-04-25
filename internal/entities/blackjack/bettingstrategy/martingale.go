@@ -42,7 +42,7 @@ func (m *Martingale) decide(p *blackjack.BlackjackPlayer, handIndex int) error {
 	case utils.Push, utils.SplitWon1:
 		return nil
 	default:
-		return fmt.Errorf("invalid result: %s", p.Hands[handIndex].Result)
+		return fmt.Errorf("invalid result: %s", *p.Hands[handIndex].Result)
 	}
 
 	return nil
