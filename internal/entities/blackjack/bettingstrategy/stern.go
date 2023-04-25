@@ -18,14 +18,7 @@ func (s *Stern) BettingStrategy(players []blackjack.BlackjackPlayer) error {
 				continue
 			}
 
-			switch *players[i].Hands[j].Result {
-			case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
-				s.win(&players[i], j)
-			case utils.Push, utils.SplitWon1:
-				continue
-			case utils.Loss, utils.SplitWon0:
-				s.lose(&players[i], j)
-			}
+			s.decide(&players[i], j)
 		}
 	}
 
@@ -34,8 +27,19 @@ func (s *Stern) BettingStrategy(players []blackjack.BlackjackPlayer) error {
 	return nil
 }
 
-func (s *Stern) GetName() string {
+func (Stern) GetName() string {
 	return "stern"
+}
+
+func (s *Stern) decide(p *blackjack.BlackjackPlayer, handIndex int) {
+	switch *p.Hands[handIndex].Result {
+	case utils.Win, utils.Blackjack, utils.SplitWon2, utils.Bankrupt:
+		s.win(p, handIndex)
+	case utils.Loss, utils.SplitWon0:
+		s.lose(p, handIndex)
+	case utils.Push, utils.SplitWon1:
+		return
+	}
 }
 
 func (s *Stern) lose(player *blackjack.BlackjackPlayer, handNumber int) {
