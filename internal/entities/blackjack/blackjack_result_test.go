@@ -144,7 +144,7 @@ func TestBlackjack_Result(t *testing.T) {
 	require.NoError(t, err, "zap.NewDevelopment() setup error")
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
-			bj := NewBlackjack(numberOfDecks)
+			bj := NewBlackjack(logger, numberOfDecks)
 			err = bj.Results(logger, tc.inputPlayers, tc.inputDealerHand)
 
 			if tc.expectedErr != nil {

@@ -62,7 +62,7 @@ func (s *Simulator) Simulate() error {
 
 	s.players = getTestPlayers(s.SimulationConfig)
 
-	s.blackjackEngine = blackjack.NewBlackjack(s.SimulationConfig.Decks)
+	s.blackjackEngine = blackjack.NewBlackjack(s.logger, s.SimulationConfig.Decks)
 
 	s.currentRound = 0
 
@@ -125,7 +125,7 @@ func (s *Simulator) simulateRound() error {
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("bettingStrategy", err)
 	}
-	
+
 	if s.players[0].Hands[0].BetAmount > s.players[0].Credits {
 		s.players[0].Hands[0].BetAmount = s.players[0].Credits
 	}
@@ -135,7 +135,7 @@ func (s *Simulator) simulateRound() error {
 		return errorutils.ErrFailedSubMethod("DealRound", err)
 	}
 
-	err = s.blackjackEngine.Play(s.logger, s.players, dealerHand, blackjack.PlayingStrategy)
+	err = s.blackjackEngine.Play(s.players, dealerHand)
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("Play", err)
 	}

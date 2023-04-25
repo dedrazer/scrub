@@ -8,7 +8,7 @@ import (
 
 func Demo(logger *zap.Logger) {
 	logger.Debug("initialising blackjack")
-	testBlackjack := NewBlackjack(6)
+	testBlackjack := NewBlackjack(logger, 6)
 
 	players := []BlackjackPlayer{
 		{
@@ -46,7 +46,7 @@ func Demo(logger *zap.Logger) {
 
 	dealerHand.DealerLog(logger)
 
-	err = testBlackjack.Play(logger, players, dealerHand, PlayingStrategy)
+	err = testBlackjack.Play(players, dealerHand)
 	if err != nil {
 		logger.Fatal("unexpected error", zap.Error(err))
 	}
