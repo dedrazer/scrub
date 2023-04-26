@@ -109,6 +109,10 @@ func (h *Hand) IsSoft() bool {
 	return len(h.Value()) > 1
 }
 
+func (h *Hand) IsUnplayed() bool {
+	return len(h.cards) == 2 && !h.isSplit
+}
+
 func (h *Hand) Double() {
 	h.BetAmount *= 2
 	h.isDoubled = true

@@ -62,76 +62,80 @@ func (bj *Blackjack) playRound(players []BlackjackPlayer, dealerHand DealerHand)
 			return errorutils.ErrFailedSubMethod("handlePotentialSplits", err)
 		}
 
-		for j := range players[i].Hands {
-			bj.logger.Debug("turn", zap.Int("player", i+1), zap.Int("hand", j+1))
+		err = bj.playHands(&players[i], dealerHand)
+		if err != nil {
+			return errorutils.ErrFailedSubMethod("playHands", err)
+		}
+	}
 
-			var action string
-			kind := hit
+	return nil
+}
 
-			dealerHand.DealerLog(bj.logger)
-			for action != stand && !players[i].Hands[j].Bust() && players[i].Hands[j].UpperValue() != 21 {
-				players[i].Hands[j].Log(bj.logger)
+func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error {
+	for handIndex := range p.Hands {
+		bj.logger.Debug("turn", zap.Any("player", p), zap.Int("hand", handIndex+1))
 
-				kind = hit
-				if len(players[i].Hands[j].cards) == 2 && !players[i].Hands[j].isSplit {
-					kind = first
+		var action string
+		kind := hit
 
-					if players[i].Hands[j].Blackjack() {
-						bj.logger.Debug("player has blackjack")
-						break
-					}
-				}
+		dealerHand.DealerLog(bj.logger)
+		for action != stand && !p.Hands[handIndex].Bust() && p.Hands[handIndex].UpperValue() != 21 {
+			p.Hands[handIndex].Log(bj.logger)
 
-				action = bj.strategy(players[i].Hands[j], dealerHand, players[i].Credits)
-				validInput := false
-				for _, v := range acceptedInputs[kind] {
-					if action == v {
-						validInput = true
-						break
-					}
-				}
+			kind = hit
+			if p.Hands[handIndex].IsUnplayed() {
+				kind = first
+			}
 
-				if !validInput {
-					return errorutils.ErrInvalidInput(action)
-				}
-
-				if action == double {
-					var (
-						c   *deck.Card
-						err error
-					)
-					c, err = bj.DealCard()
-					if err != nil {
-						return errorutils.ErrFailedSubMethod("DealCard", err)
-					}
-
-					players[i].Hands[j].Double()
-
-					players[i].Hands[j].AddCard(*c)
-					players[i].Hands[j].Log(bj.logger)
-
-					action = stand
+			action = bj.strategy(p.Hands[handIndex], dealerHand, p.Credits)
+			validInput := false
+			for _, v := range acceptedInputs[kind] {
+				if action == v {
+					validInput = true
 					break
 				}
+			}
 
-				if action == hit {
-					var (
-						c   *deck.Card
-						err error
-					)
-					c, err = bj.DealCard()
-					if err != nil {
-						return errorutils.ErrFailedSubMethod("DealCard", err)
-					}
+			if !validInput {
+				return errorutils.ErrInvalidInput(action)
+			}
 
-					players[i].Hands[j].AddCard(*c)
-					c.Log(bj.logger)
+			if action == double {
+				var (
+					c   *deck.Card
+					err error
+				)
+				c, err = bj.DealCard()
+				if err != nil {
+					return errorutils.ErrFailedSubMethod("DealCard", err)
 				}
+
+				p.Hands[handIndex].Double()
+
+				p.Hands[handIndex].AddCard(*c)
+				p.Hands[handIndex].Log(bj.logger)
+
+				action = stand
+				break
 			}
 
-			if players[i].Hands[j].Bust() {
-				bj.logger.Debug("player bust")
+			if action == hit {
+				var (
+					c   *deck.Card
+					err error
+				)
+				c, err = bj.DealCard()
+				if err != nil {
+					return errorutils.ErrFailedSubMethod("DealCard", err)
+				}
+
+				p.Hands[handIndex].AddCard(*c)
+				c.Log(bj.logger)
 			}
+		}
+
+		if p.Hands[handIndex].Bust() {
+			bj.logger.Debug("player bust")
 		}
 	}
 

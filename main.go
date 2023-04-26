@@ -21,7 +21,7 @@ func main() {
 	}
 
 	simulationConfig := blackjackanalytics.SimulationConfig{
-		MaxRounds:       100000,
+		MaxRounds:       200000,
 		Decks:           6,
 		BankCredits:     3000000,
 		BankAtCredits:   10000,
