@@ -37,41 +37,32 @@ func (bj *Blackjack) setPlayerResults(players []BlackjackPlayer, dealerHand Deal
 	for i, p := range players {
 		for j, h := range p.Hands {
 			if h.Bust() {
-				bj.PlayerBust++
-				bj.PlayerLosses++
-				players[i].Hands[j].Result = &utils.Loss
+				bj.ResultPlayerBust(&players[i].Hands[j])
 				continue
 			}
 
 			if h.Blackjack() && !dealerHand.Blackjack() {
-				bj.PlayerBlackjackCount++
-				bj.PlayerWins++
-				players[i].Hands[j].Result = &utils.Blackjack
+				bj.ResultPlayerBlackjack(&players[i].Hands[j])
 				continue
 			}
 
 			if dealerBust {
-				bj.DealerBust++
-				bj.PlayerWins++
-				players[i].Hands[j].Result = &utils.Win
+				bj.ResultDealerBust(&players[i].Hands[j])
 				continue
 			}
 
 			if h.UpperValue() < dealerHand.UpperValue() {
-				bj.PlayerLosses++
-				players[i].Hands[j].Result = &utils.Loss
+				bj.ResultDealerWins(&players[i].Hands[j])
 				continue
 			}
 
 			if h.UpperValue() > dealerHand.UpperValue() {
-				bj.PlayerWins++
-				players[i].Hands[j].Result = &utils.Win
+				bj.ResultPlayerWins(&players[i].Hands[j])
 				continue
 			}
 
 			if h.UpperValue() == dealerHand.UpperValue() {
-				bj.Pushes++
-				players[i].Hands[j].Result = &utils.Push
+				bj.ResultPush(&players[i].Hands[j])
 				continue
 			}
 
