@@ -24,6 +24,8 @@ var (
 func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) error {
 	if dealerHand.Blackjack() {
 		bj.logger.Debug("dealer has blackjack")
+
+		bj.checkIfPlayersHaveBlackJack(players)
 	} else {
 		bj.logger.Debug("playing round")
 		err := bj.playRound(players, dealerHand)
@@ -150,6 +152,28 @@ func (bj *Blackjack) playRound(players []BlackjackPlayer, dealerHand DealerHand)
 
 			if players[i].Hands[j].Bust() {
 				bj.logger.Debug("player bust")
+			}
+		}
+	}
+
+	return nil
+}
+
+func (bj *Blackjack) checkIfPlayersHaveBlackJack(players []BlackjackPlayer) error {
+	for i := range players {
+		for j := range players[i].Hands {
+			if players[i].Hands[j].UpperValue() >= 10 {
+				var (
+					c   *deck.Card
+					err error
+				)
+				c, err = bj.DealCard()
+				if err != nil {
+					return errorutils.ErrFailedSubMethod("DealCard", err)
+				}
+
+				players[i].Hands[j].AddCard(*c)
+				c.Log(bj.logger)
 			}
 		}
 	}
