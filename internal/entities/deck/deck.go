@@ -29,7 +29,7 @@ var (
 		"Queen": 10,
 		"King":  10,
 	}
-	suits = []string{"Clubs", "Diamonds", "Hearts", "Spades"}
+	suits = []string{Clubs, Diamonds, Hearts, Spades}
 )
 
 type Card struct {
