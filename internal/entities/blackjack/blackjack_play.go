@@ -91,7 +91,7 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			}
 
 			if action == double {
-				err = bj.double(&p.Hands[handIndex])
+				err = bj.double(p, handIndex)
 				if err != nil {
 					return errorutils.ErrFailedSubMethod("double", err)
 				}
@@ -101,14 +101,10 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			}
 
 			if action == hit {
-				var c *deck.Card
-				c, err = bj.DealCard()
+				err = bj.dealPlayerACard(p, handIndex)
 				if err != nil {
-					return errorutils.ErrFailedSubMethod("DealCard", err)
+					return errorutils.ErrFailedSubMethod("dealPlayerACard", err)
 				}
-
-				p.Hands[handIndex].AddCard(*c)
-				c.Log(bj.logger)
 			}
 		}
 
@@ -120,16 +116,25 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 	return nil
 }
 
-func (bj *Blackjack) double(h *Hand) error {
+func (bj *Blackjack) dealPlayerACard(p *BlackjackPlayer, handIndex int) error {
 	c, err := bj.DealCard()
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("DealCard", err)
 	}
 
-	h.DoubleBetAmount()
+	p.Hands[handIndex].AddCard(*c)
+	c.Log(bj.logger)
 
-	h.AddCard(*c)
-	h.Log(bj.logger)
+	return nil
+}
+
+func (bj *Blackjack) double(p *BlackjackPlayer, handIndex int) error {
+	err := bj.dealPlayerACard(p, handIndex)
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("dealPlayerACard", err)
+	}
+
+	p.Hands[handIndex].DoubleBetAmount()
 
 	return nil
 }
