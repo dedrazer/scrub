@@ -91,7 +91,7 @@ func (bj *Blackjack) playRound(players []BlackjackPlayer, dealerHand DealerHand)
 				if len(players[i].Hands[j].cards) == 2 && !players[i].Hands[j].isSplit {
 					kind = first
 
-					if players[i].Hands[j].UpperValue() == 21 {
+					if players[i].Hands[j].Blackjack() {
 						bj.logger.Debug("player has blackjack")
 						break
 					}
