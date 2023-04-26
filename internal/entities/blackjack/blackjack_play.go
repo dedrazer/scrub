@@ -91,19 +91,10 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			}
 
 			if action == double {
-				var (
-					c   *deck.Card
-					err error
-				)
-				c, err = bj.DealCard()
+				err = bj.double(&p.Hands[handIndex])
 				if err != nil {
-					return errorutils.ErrFailedSubMethod("DealCard", err)
+					return errorutils.ErrFailedSubMethod("double", err)
 				}
-
-				p.Hands[handIndex].Double()
-
-				p.Hands[handIndex].AddCard(*c)
-				p.Hands[handIndex].Log(bj.logger)
 
 				action = stand
 				break
@@ -128,6 +119,20 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			bj.logger.Debug("player bust")
 		}
 	}
+
+	return nil
+}
+
+func (bj *Blackjack) double(h *Hand) error {
+	c, err := bj.DealCard()
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("DealCard", err)
+	}
+
+	h.DoubleBetAmount()
+
+	h.AddCard(*c)
+	h.Log(bj.logger)
 
 	return nil
 }

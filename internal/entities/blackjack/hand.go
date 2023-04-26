@@ -113,7 +113,7 @@ func (h *Hand) IsUnplayed() bool {
 	return len(h.cards) == 2 && !h.isSplit
 }
 
-func (h *Hand) Double() {
+func (h *Hand) DoubleBetAmount() {
 	h.BetAmount *= 2
 	h.isDoubled = true
 }
