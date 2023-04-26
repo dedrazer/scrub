@@ -4,21 +4,33 @@ import (
 	"errors"
 	"scrub/internal/entities/blackjack/utils"
 	"scrub/internal/errorutils"
-
-	"go.uber.org/zap"
 )
 
-func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, dealerHand DealerHand) error {
-	logger.Debug("calculating results")
+func (bj *Blackjack) Results(players []BlackjackPlayer, dealerHand DealerHand) error {
+	bj.logger.Debug("calculating results")
 
-	err := bj.DrawDealerCards(logger, &dealerHand)
+	err := bj.DrawDealerCards(&dealerHand)
 	if err != nil {
 		return errorutils.ErrFailedSubMethod("DrawDealerCards", err)
 	}
 
+	err = bj.setPlayerResults(players, dealerHand)
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("setPlayerResults", err)
+	}
+
+	err = updateCreditBalance(players)
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("updateCreditBalance", err)
+	}
+
+	return nil
+}
+
+func (bj *Blackjack) setPlayerResults(players []BlackjackPlayer, dealerHand DealerHand) error {
 	dealerBust := false
 	if dealerHand.Bust() {
-		logger.Debug("dealer bust")
+		bj.logger.Debug("dealer bust")
 		dealerBust = true
 	}
 
@@ -65,11 +77,6 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 
 			return errors.New("unexpected case")
 		}
-	}
-
-	err = updateCreditBalance(players)
-	if err != nil {
-		return errorutils.ErrFailedSubMethod("updateCreditBalance", err)
 	}
 
 	return nil

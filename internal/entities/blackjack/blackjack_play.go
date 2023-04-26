@@ -38,7 +38,7 @@ func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) erro
 		}
 	}
 
-	if err := bj.Results(bj.logger, players, dealerHand); err != nil {
+	if err := bj.Results(players, dealerHand); err != nil {
 		return errorutils.ErrFailedSubMethod("Results", err)
 	}
 

@@ -145,7 +145,7 @@ func TestBlackjack_Result(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
 			bj := NewBlackjack(logger, numberOfDecks)
-			err = bj.Results(logger, tc.inputPlayers, tc.inputDealerHand)
+			err = bj.Results(tc.inputPlayers, tc.inputDealerHand)
 
 			if tc.expectedErr != nil {
 				require.ErrorContains(t, err, tc.expectedErr.Error(), "expected error message")
