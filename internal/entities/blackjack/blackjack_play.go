@@ -3,6 +3,7 @@ package blackjack
 import (
 	"scrub/internal/entities/deck"
 	"scrub/internal/errorutils"
+	"scrub/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -57,7 +58,7 @@ func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) erro
 func (bj *Blackjack) playRound(players []BlackjackPlayer, dealerHand DealerHand) error {
 	for i, p := range players {
 		for j := range p.Hands {
-			err := validateBetAmount(players[i].Hands[j].BetAmount, players[i].Credits)
+			err := utils.ValidateBetAmount(players[i].Hands[j].BetAmount, players[i].Credits)
 			if err != nil {
 				return err
 			}
@@ -169,14 +170,6 @@ func (bj *Blackjack) checkIfPlayersHaveBlackJack(players []BlackjackPlayer) erro
 				c.Log(bj.logger)
 			}
 		}
-	}
-
-	return nil
-}
-
-func validateBetAmount(betAmount, credits uint64) error {
-	if betAmount > credits {
-		return errorutils.ErrInsufficientCredits
 	}
 
 	return nil
