@@ -5,53 +5,15 @@ import (
 	"scrub/internal/errorutils"
 )
 
-func (bj *Blackjack) DealRound(players []BlackjackPlayer) (dealerHand DealerHand, err error) {
-	for i := range players {
-		for j := range players[i].Hands {
-			if len(players[i].Hands[j].cards) > 0 {
-				players[i].Hands[j].cards = []deck.Card{}
-			}
+func (bj *Blackjack) DealRound(players []BlackjackPlayer) (DealerHand, error) {
+	resetHands(players)
 
-			if players[i].Hands[j].BetAmount == 0 {
-				continue
-			}
-		}
-	}
-
-	// Deal first card to each player
-	err = bj.DealRoundOfCards(players)
-	if err != nil {
-		return dealerHand, errorutils.ErrFailedSubMethod("DealRoundOfCards", err)
-	}
-
-	dealerHand.cards = make([]deck.Card, 2)
-
-	// Deal down card to dealer
-	dealerCardDown, err := bj.DealCard()
-	if err != nil {
-		return dealerHand, errorutils.ErrFailedSubMethod("DealCard (dealer down)", err)
-	}
-
-	dealerHand.cards[0] = *dealerCardDown
-
-	// Deal second card to each player
-	err = bj.DealRoundOfCards(players)
-	if err != nil {
-		return dealerHand, errorutils.ErrFailedSubMethod("DealRoundOfCards", err)
-	}
-
-	// Deal up card to dealer
-	dealerCardUp, err := bj.DealCard()
-	if err != nil {
-		return dealerHand, errorutils.ErrFailedSubMethod("DealCard (dealer up)", err)
-	}
-
-	dealerHand.cards[1] = *dealerCardUp
+	dealerHand, err := bj.dealCards(players)
 
 	return dealerHand, err
 }
 
-func (bj *Blackjack) DealRoundOfCards(players []BlackjackPlayer) error {
+func (bj *Blackjack) DealACardToEachPlayer(players []BlackjackPlayer) error {
 	for i := range players {
 		if len(players[i].Hands) == 0 {
 			players[i].Hands = make([]Hand, 1)
@@ -64,6 +26,57 @@ func (bj *Blackjack) DealRoundOfCards(players []BlackjackPlayer) error {
 
 			players[i].Hands[j].AddCard(*card)
 		}
+	}
+
+	return nil
+}
+
+func resetHands(players []BlackjackPlayer) {
+	for i := range players {
+		for j := range players[i].Hands {
+			players[i].Hands[j].cards = []deck.Card{}
+		}
+	}
+}
+
+func (bj *Blackjack) dealCards(players []BlackjackPlayer) (DealerHand, error) {
+	var dealerHand DealerHand
+
+	err := bj.DealACardToEachPlayer(players)
+	if err != nil {
+		return dealerHand, errorutils.ErrFailedSubMethod("DealACardToEachPlayer", err)
+	}
+
+	dealerHand.cards = make([]deck.Card, 2)
+
+	err = bj.dealCardToDealer(&dealerHand, true)
+	if err != nil {
+		return dealerHand, errorutils.ErrFailedSubMethod("dealDownCardToDealer", err)
+	}
+
+	err = bj.DealACardToEachPlayer(players)
+	if err != nil {
+		return dealerHand, errorutils.ErrFailedSubMethod("DealACardToEachPlayer", err)
+	}
+
+	err = bj.dealCardToDealer(&dealerHand, false)
+	if err != nil {
+		return dealerHand, errorutils.ErrFailedSubMethod("dealUpCardToDealer", err)
+	}
+
+	return dealerHand, nil
+}
+
+func (bj *Blackjack) dealCardToDealer(dealerHand *DealerHand, faceDown bool) error {
+	card, err := bj.DealCard()
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("DealCard (dealer down)", err)
+	}
+
+	if faceDown {
+		dealerHand.cards[0] = *card
+	} else {
+		dealerHand.cards[1] = *card
 	}
 
 	return nil
