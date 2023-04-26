@@ -101,10 +101,7 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			}
 
 			if action == hit {
-				var (
-					c   *deck.Card
-					err error
-				)
+				var c *deck.Card
 				c, err = bj.DealCard()
 				if err != nil {
 					return errorutils.ErrFailedSubMethod("DealCard", err)
