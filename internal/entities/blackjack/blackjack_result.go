@@ -67,6 +67,15 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 		}
 	}
 
+	err = updateCreditBalance(players)
+	if err != nil {
+		return errorutils.ErrFailedSubMethod("updateCreditBalance", err)
+	}
+
+	return nil
+}
+
+func updateCreditBalance(players []BlackjackPlayer) error {
 	splitWinCount := 0
 
 	for i, p := range players {
@@ -85,7 +94,7 @@ func (bj *Blackjack) Results(logger *zap.Logger, players []BlackjackPlayer, deal
 
 				players[i].Win(h.BetAmount)
 			case utils.Loss:
-				err = players[i].Lose(h.BetAmount)
+				err := players[i].Lose(h.BetAmount)
 				if err != nil {
 					return errorutils.ErrFailedSubMethod("Lose", err)
 				}
