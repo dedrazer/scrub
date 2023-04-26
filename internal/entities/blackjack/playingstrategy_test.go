@@ -2,6 +2,7 @@ package blackjack
 
 import (
 	"fmt"
+	bjutils "scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
 	"scrub/internal/testutils"
 	"testing"
@@ -22,67 +23,67 @@ func TestStrategy1(t *testing.T) {
 			name:          "player should hit on soft 17",
 			playerSymbols: []string{"Ace", "6"},
 			dealerSymbol:  "7",
-			expected:      hit,
+			expected:      bjutils.Hit,
 		},
 		{
 			name:          "player should stand on hard 17",
 			playerSymbols: []string{"7", "10"},
 			dealerSymbol:  "6",
-			expected:      stand,
+			expected:      bjutils.Stand,
 		},
 		{
 			name:          "player should hit on soft 18",
 			playerSymbols: []string{"Ace", "7"},
 			dealerSymbol:  "9",
-			expected:      hit,
+			expected:      bjutils.Hit,
 		},
 		{
 			name:          "player should stand on hard 18",
 			playerSymbols: []string{"8", "10"},
 			dealerSymbol:  "Q",
-			expected:      stand,
+			expected:      bjutils.Stand,
 		},
 		{
 			name:          "player should stand on 19",
 			playerSymbols: []string{"10", "9"},
 			dealerSymbol:  "5",
-			expected:      stand,
+			expected:      bjutils.Stand,
 		},
 		{
 			name:          "player should hit on 12",
 			playerSymbols: []string{"4", "8"},
 			dealerSymbol:  "Q",
-			expected:      hit,
+			expected:      bjutils.Hit,
 		},
 		{
 			name:          "player should stand on 20",
 			playerSymbols: []string{"10", "10"},
 			dealerSymbol:  "2",
-			expected:      stand,
+			expected:      bjutils.Stand,
 		},
 		{
 			name:          "player double down on hard 11",
 			playerSymbols: []string{"6", "5"},
 			dealerSymbol:  "J",
-			expected:      double,
+			expected:      bjutils.Double,
 		},
 		{
 			name:          "player should stand on soft 21",
 			playerSymbols: []string{"10", "Ace"},
 			dealerSymbol:  "J",
-			expected:      stand,
+			expected:      bjutils.Stand,
 		},
 		{
 			name:          "player should double down on 10",
 			playerSymbols: []string{"5", "5"},
 			dealerSymbol:  "4",
-			expected:      double,
+			expected:      bjutils.Double,
 		},
 		{
 			name:          "player should double down on 9",
 			playerSymbols: []string{"4", "5"},
 			dealerSymbol:  "3",
-			expected:      double,
+			expected:      bjutils.Double,
 		},
 	}
 

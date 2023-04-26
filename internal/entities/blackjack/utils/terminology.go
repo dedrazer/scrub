@@ -1,5 +1,14 @@
 package utils
 
+const (
+	First = "first"
+
+	Stand  = "stand"
+	Split  = "split"
+	Hit    = "hit"
+	Double = "double"
+)
+
 var (
 	Win       = "win"
 	Loss      = "loss"

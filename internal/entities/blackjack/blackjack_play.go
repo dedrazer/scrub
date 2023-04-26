@@ -9,15 +9,6 @@ import (
 	"go.uber.org/zap"
 )
 
-var (
-	first = "first"
-
-	stand  = "stand"
-	split  = "split"
-	hit    = "hit"
-	double = "double"
-)
-
 func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) error {
 	if dealerHand.Blackjack() {
 		bj.logger.Debug("dealer has blackjack")
@@ -72,15 +63,15 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 		bj.logger.Debug("turn", zap.Any("player", p), zap.Int("hand", handIndex+1))
 
 		var action string
-		kind := hit
+		kind := bjutils.Hit
 
 		dealerHand.DealerLog(bj.logger)
-		for action != stand && !p.Hands[handIndex].Bust() && p.Hands[handIndex].UpperValue() != 21 {
+		for ShouldContinuePlaying(action, p.Hands[handIndex]) {
 			p.Hands[handIndex].Log(bj.logger)
 
-			kind = hit
+			kind = bjutils.Hit
 			if p.Hands[handIndex].IsUnplayed() {
-				kind = first
+				kind = bjutils.First
 			}
 
 			action = bj.strategy(p.Hands[handIndex], dealerHand, p.Credits)
@@ -90,17 +81,17 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 				return err
 			}
 
-			if action == double {
+			if action == bjutils.Double {
 				err = bj.double(p, handIndex)
 				if err != nil {
 					return errorutils.ErrFailedSubMethod("double", err)
 				}
 
-				action = stand
+				action = bjutils.Stand
 				break
 			}
 
-			if action == hit {
+			if action == bjutils.Hit {
 				err = bj.dealPlayerACard(p, handIndex)
 				if err != nil {
 					return errorutils.ErrFailedSubMethod("dealPlayerACard", err)
@@ -173,7 +164,7 @@ func (bj *Blackjack) handlePotentialSplits(p *BlackjackPlayer, dealerHand Dealer
 		if p.Hands[handIndex].CanSplit(p.Credits) {
 			action := bj.strategy(p.Hands[handIndex], dealerHand, p.Credits)
 
-			if action == split {
+			if action == bjutils.Split {
 				err = bj.split(p, handIndex)
 				if err != nil {
 					return err
@@ -183,4 +174,8 @@ func (bj *Blackjack) handlePotentialSplits(p *BlackjackPlayer, dealerHand Dealer
 	}
 
 	return nil
+}
+
+func ShouldContinuePlaying(action string, hand Hand) bool {
+	return action != bjutils.Stand && !hand.Bust() && hand.UpperValue() != 21
 }
