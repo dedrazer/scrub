@@ -41,12 +41,20 @@ func TestMain(m *testing.M) {
 
 	testSimulator = NewSimulator(logger, testStrategy, testSimulationConfig)
 
-	testPlayers := getTestPlayers(testSimulationConfig)
-	testSimulator.players = testPlayers
+	testSimulator.Init()
 
 	runCode := m.Run()
 
 	os.Exit(runCode)
+}
+
+func TestSimulator_simulateRounds(t *testing.T) {
+	roundBefore := testSimulator.currentRound
+
+	err := testSimulator.simulateRounds()
+
+	require.NoError(t, err)
+	require.Equal(t, roundBefore+100, testSimulator.currentRound)
 }
 
 func TestSimulator_rebuy_ErrorNoRebuysRemaining(t *testing.T) {

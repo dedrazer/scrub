@@ -60,11 +60,7 @@ func NewSimulator(logger *zap.Logger, strategy bettingstrategy.Strategy, config 
 func (s *Simulator) Simulate() error {
 	s.logger.Info("starting simulation", zap.Any("config", s.SimulationConfig))
 
-	s.players = getTestPlayers(s.SimulationConfig)
-
-	s.blackjackEngine = blackjack.NewBlackjack(s.logger, s.SimulationConfig.Decks)
-
-	s.currentRound = 0
+	s.Init()
 
 	err := s.simulateRounds()
 	if err != nil {
@@ -100,8 +96,6 @@ func (s *Simulator) simulateRounds() error {
 		if err != nil {
 			return errorutils.ErrFailedSubMethod("simulateRound", err)
 		}
-
-		s.currentRound++
 	}
 
 	return nil
@@ -140,7 +134,17 @@ func (s *Simulator) simulateRound() error {
 		return errorutils.ErrFailedSubMethod("Play", err)
 	}
 
+	s.currentRound++
+
 	return nil
+}
+
+func (s *Simulator) Init() {
+	s.players = getTestPlayers(s.SimulationConfig)
+
+	s.blackjackEngine = blackjack.NewBlackjack(s.logger, s.SimulationConfig.Decks)
+
+	s.currentRound = 0
 }
 
 func (s *Simulator) rebuy() error {
