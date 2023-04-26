@@ -1,6 +1,7 @@
 package blackjack
 
 import (
+	bjutils "scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
 	"scrub/internal/errorutils"
 	"scrub/internal/utils"
@@ -9,11 +10,6 @@ import (
 )
 
 var (
-	acceptedInputs = map[string][]string{
-		"first": {"hit", "double", "stand"},
-		"hit":   {"hit", "stand"},
-	}
-
 	first = "first"
 
 	stand  = "stand"
@@ -88,16 +84,10 @@ func (bj *Blackjack) playHands(p *BlackjackPlayer, dealerHand DealerHand) error 
 			}
 
 			action = bj.strategy(p.Hands[handIndex], dealerHand, p.Credits)
-			validInput := false
-			for _, v := range acceptedInputs[kind] {
-				if action == v {
-					validInput = true
-					break
-				}
-			}
 
-			if !validInput {
-				return errorutils.ErrInvalidInput(action)
+			err := bjutils.ValidateInput(kind, action)
+			if err != nil {
+				return err
 			}
 
 			if action == double {
