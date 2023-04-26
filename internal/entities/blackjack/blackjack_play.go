@@ -56,25 +56,10 @@ func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) erro
 }
 
 func (bj *Blackjack) playRound(players []BlackjackPlayer, dealerHand DealerHand) error {
-	for i, p := range players {
-		for j := range p.Hands {
-			err := utils.ValidateBetAmount(players[i].Hands[j].BetAmount, players[i].Credits)
-			if err != nil {
-				return err
-			}
-
-			bj.logger.Debug("bet info", zap.Uint64("amount", players[i].Hands[j].BetAmount))
-
-			if players[i].Hands[j].CanSplit(players[i].Credits) {
-				action := bj.strategy(p.Hands[j], dealerHand, players[i].Credits)
-
-				if action == split {
-					err = bj.split(&players[i], j)
-					if err != nil {
-						return err
-					}
-				}
-			}
+	for i := range players {
+		err := bj.handlePotentialSplits(&players[i], dealerHand)
+		if err != nil {
+			return errorutils.ErrFailedSubMethod("handlePotentialSplits", err)
 		}
 
 		for j := range players[i].Hands {
@@ -168,6 +153,30 @@ func (bj *Blackjack) checkIfPlayersHaveBlackJack(players []BlackjackPlayer) erro
 
 				players[i].Hands[j].AddCard(*c)
 				c.Log(bj.logger)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (bj *Blackjack) handlePotentialSplits(p *BlackjackPlayer, dealerHand DealerHand) error {
+	for handIndex := range p.Hands {
+		err := utils.ValidateBetAmount(p.Hands[handIndex].BetAmount, p.Credits)
+		if err != nil {
+			return err
+		}
+
+		bj.logger.Debug("bet info", zap.Uint64("amount", p.Hands[handIndex].BetAmount))
+
+		if p.Hands[handIndex].CanSplit(p.Credits) {
+			action := bj.strategy(p.Hands[handIndex], dealerHand, p.Credits)
+
+			if action == split {
+				err = bj.split(p, handIndex)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
