@@ -33,7 +33,7 @@ func (bj *Blackjack) DrawRemainingDealerCards(dh *DealerHand) error {
 	}
 
 	if dh.hasNoValue() {
-		return errors.New("no value")
+		return errors.New("dealer hand has no value yet")
 	}
 
 	if dh.shouldDraw() {

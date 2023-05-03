@@ -15,7 +15,7 @@ func (dh *DealerHand) hasSoftValue() bool {
 }
 
 func (dh *DealerHand) hasNoValue() bool {
-	return len(dh.Value()) == 0
+	return len(dh.Value()) == 0 || dh.UpperValue() == 0
 }
 
 func (dh *DealerHand) DealerLog(logger *zap.Logger) {

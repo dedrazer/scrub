@@ -3,6 +3,7 @@ package blackjack
 import (
 	"errors"
 	"fmt"
+	"scrub/internal/entities/deck"
 	"scrub/internal/testutils"
 	"testing"
 
@@ -36,6 +37,15 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 			name:          "Dealer hand is nil",
 			dealerHand:    nil,
 			expectedError: errors.New("dealer hand is nil"),
+		},
+		{
+			name: "Dealer hand has no value",
+			dealerHand: &DealerHand{
+				Hand: Hand{
+					cards: []deck.Card{},
+				},
+			},
+			expectedError: errors.New("dealer hand has no value yet"),
 		},
 	}
 
