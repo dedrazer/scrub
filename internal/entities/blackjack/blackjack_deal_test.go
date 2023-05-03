@@ -26,10 +26,11 @@ func TestBlackjack_DealCard(t *testing.T) {
 
 func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 	type testCase struct {
-		name               string
-		dealerHand         *DealerHand
-		expectedDealerHand *DealerHand
-		expectedError      error
+		name                       string
+		dealerHand                 *DealerHand
+		expectedDealerHand         *DealerHand
+		expectedError              error
+		expectedNumberOfDrawnCards int
 	}
 
 	testCases := []testCase{
@@ -39,12 +40,17 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 			expectedError: errors.New("dealer hand is nil"),
 		},
 		{
-			name: "Dealer hand has no value",
+			name: "Dealer hand has no value NoCards",
 			dealerHand: &DealerHand{
 				Hand: Hand{
 					cards: []deck.Card{},
 				},
 			},
+			expectedError: errors.New("dealer hand has no value yet"),
+		},
+		{
+			name:          "Dealer hand has no value Nil",
+			dealerHand:    &DealerHand{},
 			expectedError: errors.New("dealer hand has no value yet"),
 		},
 	}
