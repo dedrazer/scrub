@@ -1,11 +1,29 @@
 package blackjack
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
+
+var (
+	testBlackjack *Blackjack
+)
+
+func TestMain(m *testing.M) {
+	testLogger, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+
+	testBlackjack = NewBlackjack(testLogger, 10)
+
+	runCode := m.Run()
+
+	os.Exit(runCode)
+}
 
 func TestNewBlackjack(t *testing.T) {
 	testLogger, err := zap.NewProduction()
