@@ -68,8 +68,12 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 
 	for tn, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
-			beforeActiveCards := len(testBlackjack.deck.ActiveCards)
-			beforeDealerCards := len(tc.dealerHand.cards)
+			var beforeActiveCards, beforeDealerCards int
+			
+			if tc.dealerHand != nil {
+				beforeActiveCards = len(testBlackjack.deck.ActiveCards)
+				beforeDealerCards = len(tc.dealerHand.cards)
+			}
 
 			actualErr := testBlackjack.DrawRemainingDealerCards(tc.dealerHand)
 
