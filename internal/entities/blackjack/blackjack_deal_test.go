@@ -28,7 +28,6 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 	type testCase struct {
 		name                       string
 		dealerHand                 *DealerHand
-		expectedDealerHand         *DealerHand
 		expectedError              error
 		expectedNumberOfDrawnCards int
 	}
@@ -53,10 +52,25 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 			dealerHand:    &DealerHand{},
 			expectedError: errors.New("dealer hand has no value yet"),
 		},
+		{
+			name: "Dealer should draw 1 card",
+			dealerHand: &DealerHand{
+				Hand: Hand{
+					cards: []deck.Card{
+						deck.QueenOfHearts,
+						deck.SixOfClubs,
+					},
+				},
+			},
+			expectedNumberOfDrawnCards: 1,
+		},
 	}
 
 	for tn, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			beforeActiveCards := len(testBlackjack.deck.ActiveCards)
+			beforeDealerCards := len(tc.dealerHand.cards)
+
 			actualErr := testBlackjack.DrawRemainingDealerCards(tc.dealerHand)
 
 			if tc.expectedError != nil {
@@ -65,7 +79,8 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 			}
 
 			require.NoError(t, actualErr)
-			require.Equal(t, tc.expectedDealerHand, tc.dealerHand)
+			require.Len(t, tc.dealerHand.cards, beforeDealerCards+tc.expectedNumberOfDrawnCards)
+			require.Len(t, testBlackjack.deck.ActiveCards, beforeActiveCards-tc.expectedNumberOfDrawnCards)
 		})
 	}
 }
