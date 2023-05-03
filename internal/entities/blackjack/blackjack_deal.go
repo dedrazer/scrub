@@ -4,8 +4,6 @@ import (
 	"errors"
 	"scrub/internal/entities/deck"
 	"scrub/internal/errorutils"
-
-	"go.uber.org/zap"
 )
 
 func (bj *Blackjack) DealCard() (*deck.Card, error) {
@@ -39,7 +37,7 @@ func (bj *Blackjack) DrawRemainingDealerCards(dh *DealerHand) error {
 	if dh.shouldDraw() {
 		c, err := bj.DealCard()
 		if err != nil {
-			bj.logger.Error("failed to deal card", zap.Error(err))
+			return err
 		}
 
 		dh.AddCard(*c)
