@@ -27,7 +27,7 @@ func (bj *Blackjack) DealCard() (*deck.Card, error) {
 // The dealer must continue to take cards until the total is 17 or more, at which point the dealer must stand.
 // If the dealer has an ace, and counting it as 11 would bring the total to 17 or more (but not over 21),
 // the dealer must count the ace as 11 and stand.
-func (bj *Blackjack) DrawDealerCards(dh *DealerHand) error {
+func (bj *Blackjack) DrawRemainingDealerCards(dh *DealerHand) error {
 	if dh.hasNoValue() {
 		return errors.New("no value")
 	}
@@ -39,7 +39,7 @@ func (bj *Blackjack) DrawDealerCards(dh *DealerHand) error {
 		}
 
 		dh.AddCard(*c)
-		return bj.DrawDealerCards(dh)
+		return bj.DrawRemainingDealerCards(dh)
 	}
 
 	dh.DealerResult(bj.logger)

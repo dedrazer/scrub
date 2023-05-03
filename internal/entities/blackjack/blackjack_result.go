@@ -9,9 +9,9 @@ import (
 func (bj *Blackjack) Results(players []BlackjackPlayer, dealerHand DealerHand) error {
 	bj.logger.Debug("calculating results")
 
-	err := bj.DrawDealerCards(&dealerHand)
+	err := bj.DrawRemainingDealerCards(&dealerHand)
 	if err != nil {
-		return errorutils.ErrFailedSubMethod("DrawDealerCards", err)
+		return errorutils.ErrFailedSubMethod("DrawRemainingDealerCards", err)
 	}
 
 	err = bj.setPlayerResults(players, dealerHand)
