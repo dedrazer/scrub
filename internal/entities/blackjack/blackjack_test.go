@@ -10,9 +10,16 @@ import (
 
 var (
 	testBlackjack *Blackjack
+	testLogger    *zap.Logger
 )
 
 func TestMain(m *testing.M) {
+	var err error
+	testLogger, err = zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	
 	resetBJ()
 
 	runCode := m.Run()
@@ -21,10 +28,6 @@ func TestMain(m *testing.M) {
 }
 
 func resetBJ() {
-	testLogger, err := zap.NewProduction()
-	if err != nil {
-		panic(err)
-	}
 	testBlackjack = NewBlackjack(testLogger, 10)
 }
 

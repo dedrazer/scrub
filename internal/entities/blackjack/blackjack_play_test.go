@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 )
 
 func TestBlackjack_Play(t *testing.T) {
@@ -19,9 +18,6 @@ func TestBlackjack_Play(t *testing.T) {
 		expectedErr     error
 		expectedSplit   bool
 	}
-
-	testLogger, err := zap.NewDevelopment()
-	require.NoError(t, err, "failed to init zap logger")
 
 	testPlayer := player.Player{
 		Name:    "Player 1",
@@ -86,9 +82,9 @@ func TestBlackjack_Play(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, i, tc.name), func(t *testing.T) {
-			testBlackjack := NewBlackjack(testLogger, 10)
+			resetBJ()
 
-			err = testBlackjack.Play(tc.inputPlayers, tc.inputDealerHand)
+			err := testBlackjack.Play(tc.inputPlayers, tc.inputDealerHand)
 
 			if tc.expectedErr != nil {
 				require.ErrorContains(t, tc.expectedErr, err.Error(), "error value")
