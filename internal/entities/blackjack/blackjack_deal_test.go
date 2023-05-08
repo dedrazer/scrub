@@ -24,6 +24,20 @@ func TestBlackjack_DealCard(t *testing.T) {
 	require.Len(t, testBlackjack.deck.BurntCards, expectedBurntCards)
 }
 
+func TestBlackjack_DealCard_Shuffle(t *testing.T) {
+	testBlackjack.deck.ActiveCards = []deck.Card{}
+	testBlackjack.deck.BurntCards = deck.NewShuffledDecks(testBlackjack.numberOfDecks).ActiveCards
+
+	card, err := testBlackjack.DealCard()
+	if err != nil {
+		t.Fatalf("Failed to deal card: %s", err.Error())
+	}
+
+	require.NotNil(t, card)
+	require.Len(t, testBlackjack.deck.ActiveCards, int(testBlackjack.numberOfDecks*52)-1)
+	require.Len(t, testBlackjack.deck.BurntCards, 1)
+}
+
 func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 	type testCase struct {
 		name                       string
@@ -69,7 +83,7 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 	for tn, tc := range testCases {
 		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
 			var beforeActiveCards, beforeDealerCards int
-			
+
 			if tc.dealerHand != nil {
 				beforeActiveCards = len(testBlackjack.deck.ActiveCards)
 				beforeDealerCards = len(tc.dealerHand.cards)
