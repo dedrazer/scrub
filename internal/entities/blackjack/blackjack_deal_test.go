@@ -38,6 +38,16 @@ func TestBlackjack_DealCard_Shuffle(t *testing.T) {
 	require.Len(t, testBlackjack.deck.BurntCards, 1)
 }
 
+func TestBlackjack_DealCard_Error(t *testing.T) {
+	testBlackjack.deck.ActiveCards = []deck.Card{}
+	testBlackjack.deck.BurntCards = []deck.Card{}
+
+	_, err := testBlackjack.DealCard()
+	require.EqualError(t, err, "Failed to TakeCardByIndex: Index is out of range")
+
+	resetBJ()
+}
+
 func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 	type testCase struct {
 		name                       string
