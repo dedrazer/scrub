@@ -112,3 +112,23 @@ func TestBlackjack_DrawRemainingDealerCards(t *testing.T) {
 		})
 	}
 }
+
+func TestBlackjack_DrawRemainingDealerCards_error(t *testing.T) {
+	var dealerHand = DealerHand{
+		Hand: Hand{
+			cards: []deck.Card{
+				deck.QueenOfHearts,
+				deck.SixOfClubs,
+			},
+		},
+	}
+
+	testBlackjack.deck.ActiveCards = []deck.Card{}
+	testBlackjack.deck.BurntCards = []deck.Card{}
+
+	err := testBlackjack.DrawRemainingDealerCards(&dealerHand)
+
+	require.EqualError(t, err, "Failed to TakeCardByIndex: Index is out of range")
+
+	resetBJ()
+}
