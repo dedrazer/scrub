@@ -100,7 +100,7 @@ func TestBlackjack_Play(t *testing.T) {
 	}
 }
 
-func TestBlackjack_double(t *testing.T) {
+func TestBlackjack_double_0(t *testing.T) {
 	testPlayer := BlackjackPlayer{
 		Hands: []Hand{
 			{
@@ -130,6 +130,38 @@ func TestBlackjack_double(t *testing.T) {
 
 	require.Equal(t, uint64(50), testPlayer.Hands[1].BetAmount, "bet amount unchanged")
 	require.False(t, testPlayer.Hands[1].isDoubled, "is not doubled")
+}
+
+func TestBlackjack_double_1(t *testing.T) {
+	testPlayer := BlackjackPlayer{
+		Hands: []Hand{
+			{
+				cards: []deck.Card{
+					deck.QueenOfHearts,
+				},
+				isDoubled: false,
+				BetAmount: 10,
+			},
+			{
+				cards: []deck.Card{
+					deck.ThreeOfClubs,
+				},
+				isDoubled: false,
+				BetAmount: 50,
+			},
+		},
+	}
+
+	err := testBlackjack.double(&testPlayer, 1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	require.Equal(t, uint64(10), testPlayer.Hands[0].BetAmount, "bet amount unchanged")
+	require.False(t, testPlayer.Hands[0].isDoubled, "is not doubled")
+
+	require.Equal(t, uint64(100), testPlayer.Hands[1].BetAmount, "bet amount doubled")
+	require.True(t, testPlayer.Hands[1].isDoubled, "is doubled")
 }
 
 func TestBlackjack_double_Error(t *testing.T) {
