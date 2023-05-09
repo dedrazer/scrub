@@ -99,3 +99,62 @@ func TestBlackjack_Play(t *testing.T) {
 		})
 	}
 }
+
+func TestBlackjack_double(t *testing.T) {
+	testPlayer := BlackjackPlayer{
+		Hands: []Hand{
+			{
+				cards: []deck.Card{
+					deck.QueenOfHearts,
+				},
+				isDoubled: false,
+				BetAmount: 10,
+			},
+			{
+				cards: []deck.Card{
+					deck.ThreeOfClubs,
+				},
+				isDoubled: false,
+				BetAmount: 50,
+			},
+		},
+	}
+
+	err := testBlackjack.double(&testPlayer, 0)
+	if err != nil {
+		t.Error(err)
+	}
+
+	require.Equal(t, uint64(20), testPlayer.Hands[0].BetAmount, "bet amount doubled")
+	require.True(t, testPlayer.Hands[0].isDoubled, "is doubled")
+
+	require.Equal(t, uint64(50), testPlayer.Hands[1].BetAmount, "bet amount unchanged")
+	require.False(t, testPlayer.Hands[1].isDoubled, "is not doubled")
+}
+
+func TestBlackjack_double_Error(t *testing.T) {
+	testPlayer := BlackjackPlayer{
+		Hands: []Hand{
+			{
+				cards: []deck.Card{
+					deck.QueenOfHearts,
+				},
+				isDoubled: false,
+				BetAmount: 10,
+			},
+			{
+				cards: []deck.Card{
+					deck.ThreeOfClubs,
+				},
+				isDoubled: false,
+				BetAmount: 50,
+			},
+		},
+	}
+
+	testBlackjack.deck.ActiveCards = []deck.Card{}
+
+	err := testBlackjack.double(&testPlayer, 0)
+
+	require.EqualError(t, err, "Failed to dealPlayerACard: Failed to DealCard: Failed to TakeCardByIndex: Index is out of range")
+}
