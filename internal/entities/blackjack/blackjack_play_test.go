@@ -2,6 +2,7 @@ package blackjack
 
 import (
 	"fmt"
+	bjutils "scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
 	"scrub/internal/entities/player"
 	"scrub/internal/testutils"
@@ -185,8 +186,75 @@ func TestBlackjack_double_Error(t *testing.T) {
 	}
 
 	testBlackjack.deck.ActiveCards = []deck.Card{}
+	testBlackjack.deck.BurntCards = []deck.Card{}
 
 	err := testBlackjack.double(&testPlayer, 0)
 
 	require.EqualError(t, err, "Failed to dealPlayerACard: Failed to DealCard: Failed to TakeCardByIndex: Index is out of range")
+}
+
+func Test_ShouldContinuePlaying(t *testing.T) {
+	type testCase struct {
+		name        string
+		inputAction string
+		inputHand   Hand
+		expectedRes bool
+	}
+
+	testCases := []testCase{
+		{
+			name:        "Stand",
+			inputAction: bjutils.Stand,
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.ThreeOfClubs,
+				},
+			},
+			expectedRes: false,
+		},
+		{
+			name:        "Bust",
+			inputAction: bjutils.Hit,
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.TenOfDiamonds,
+					deck.KingOfSpades,
+					deck.EightOfClubs,
+				},
+			},
+			expectedRes: false,
+		},
+		{
+			name:        "21",
+			inputAction: bjutils.Hit,
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.EightOfHearts,
+					deck.TwoOfSpades,
+					deck.ThreeOfSpades,
+					deck.FourOfDiamonds,
+					deck.FourOfDiamonds,
+				},
+			},
+			expectedRes: false,
+		},
+		{
+			name:        "ShouldContinue",
+			inputAction: bjutils.Hit,
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.ThreeOfHearts,
+				},
+			},
+			expectedRes: true,
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			actualRes := ShouldContinuePlaying(tc.inputAction, tc.inputHand)
+
+			require.Equal(t, tc.expectedRes, actualRes)
+		})
+	}
 }
