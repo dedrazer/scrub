@@ -1,6 +1,7 @@
 package blackjack
 
 import (
+	"errors"
 	"fmt"
 	bjutils "scrub/internal/entities/blackjack/utils"
 	"scrub/internal/entities/deck"
@@ -191,6 +192,52 @@ func TestBlackjack_double_Error(t *testing.T) {
 	err := testBlackjack.double(&testPlayer, 0)
 
 	require.EqualError(t, err, "Failed to dealPlayerACard: Failed to DealCard: Failed to TakeCardByIndex: Index is out of range")
+}
+
+func TestBlackjack_handlePotentialSplits(t *testing.T) {
+	type testCase struct {
+		name            string
+		inputPlayer     *BlackjackPlayer
+		inputDealerHand DealerHand
+		expectedErr     error
+	}
+
+	testCases := []testCase{
+		{
+			name: "Error InvalidBetAmount",
+			inputPlayer: &BlackjackPlayer{
+				Hands: []Hand{
+					{
+						BetAmount: 100,
+					},
+				},
+				Player: player.Player{
+					Credits: 99,
+				},
+			},
+			inputDealerHand: DealerHand{
+				Hand: Hand{
+					cards: []deck.Card{
+						deck.AceOfClubs,
+					},
+				},
+			},
+			expectedErr: errors.New("Insufficient credits"),
+		},
+	}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			err := testBlackjack.handlePotentialSplits(tc.inputPlayer, tc.inputDealerHand)
+
+			if tc.expectedErr != nil {
+				require.EqualError(t, tc.expectedErr, err.Error(), "error value")
+				return
+			}
+
+			require.NoError(t, err, "unexpected error")
+		})
+	}
 }
 
 func Test_ShouldContinuePlaying(t *testing.T) {

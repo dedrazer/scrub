@@ -13,6 +13,13 @@ type BlackjackPlayer struct {
 	Hands []Hand
 }
 
+func NewBlackjackPlayer(player player.Player, hands []Hand) BlackjackPlayer {
+	return BlackjackPlayer{
+		Player: player,
+		Hands:  hands,
+	}
+}
+
 func (bjp *BlackjackPlayer) PrintResult(logger *zap.Logger) error {
 	for i, h := range bjp.Hands {
 		if h.Result == nil {
