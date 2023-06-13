@@ -13,7 +13,7 @@ func (bj *Blackjack) Play(players []BlackjackPlayer, dealerHand DealerHand) erro
 	if dealerHand.Blackjack() {
 		bj.logger.Debug("dealer has blackjack")
 
-		err := bj.checkIfPlayersHaveBlackJack(players)
+		err := bj.autoDrawCards(players)
 		if err != nil {
 			return err
 		}
@@ -130,23 +130,32 @@ func (bj *Blackjack) double(p *BlackjackPlayer, handIndex int) error {
 	return nil
 }
 
-func (bj *Blackjack) checkIfPlayersHaveBlackJack(players []BlackjackPlayer) error {
+func (bj *Blackjack) autoDrawCards(players []BlackjackPlayer) error {
 	for i := range players {
 		for j := range players[i].Hands {
-			if players[i].Hands[j].UpperValue() >= 10 {
-				var (
-					c   *deck.Card
-					err error
-				)
-				c, err = bj.DealCard()
-				if err != nil {
-					return errorutils.ErrFailedSubMethod("DealCard", err)
-				}
-
-				players[i].Hands[j].AddCard(*c)
-				c.Log(bj.logger)
+			err := bj.drawCardIfMightHaveBlackjack(&players[i].Hands[j])
+			if err != nil {
+				return errorutils.ErrFailedSubMethod("drawCardIfMightHaveBlackjack", err)
 			}
 		}
+	}
+
+	return nil
+}
+
+func (bj *Blackjack) drawCardIfMightHaveBlackjack(h *Hand) error {
+	if len(h.cards) == 1 && h.UpperValue() >= 10 {
+		var (
+			c   *deck.Card
+			err error
+		)
+		c, err = bj.DealCard()
+		if err != nil {
+			return errorutils.ErrFailedSubMethod("DealCard", err)
+		}
+
+		h.AddCard(*c)
+		c.Log(bj.logger)
 	}
 
 	return nil

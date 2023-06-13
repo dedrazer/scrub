@@ -194,6 +194,94 @@ func TestBlackjack_double_Error(t *testing.T) {
 	require.EqualError(t, err, "Failed to dealPlayerACard: Failed to DealCard: Failed to TakeCardByIndex: Index is out of range")
 }
 
+func Test_autoDrawCards(t *testing.T) {
+	type testCase struct {
+		name                string
+		inputHand           Hand
+		inputDeck           deck.Deck
+		shouldHaveBlackjack bool
+		shouldDraw          bool
+		expectedError       error
+	}
+
+	testCases := []testCase{
+		{
+			name: "HasBlackjack",
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.AceOfClubs,
+				},
+			},
+			inputDeck: deck.Deck{
+				ActiveCards: []deck.Card{
+					deck.TenOfClubs,
+				},
+			},
+			shouldHaveBlackjack: true,
+			shouldDraw:          true,
+		},
+		{
+			name: "DoesNotHaveBlackjack",
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.AceOfClubs,
+				},
+			},
+			inputDeck: deck.Deck{
+				ActiveCards: []deck.Card{
+					deck.NineOfClubs,
+				},
+			},
+			shouldHaveBlackjack: false,
+			shouldDraw:          true,
+		},
+		{
+			name: "HasNoChanceOfBlackjack",
+			inputHand: Hand{
+				cards: []deck.Card{
+					deck.NineOfHearts,
+				},
+			},
+			inputDeck: deck.Deck{
+				ActiveCards: []deck.Card{
+					deck.TenOfClubs,
+				},
+			},
+			shouldHaveBlackjack: false,
+			shouldDraw:          false,
+		},
+	}
+
+	testPlayer := player.Player{}
+	testBJPlayer := NewBlackjackPlayer(testPlayer, nil)
+	testBJPlayers := []BlackjackPlayer{testBJPlayer}
+
+	for tn, tc := range testCases {
+		t.Run(fmt.Sprintf(testutils.TestNameTemplate, tn, tc.name), func(t *testing.T) {
+			testBlackjack.deck = &tc.inputDeck
+			testBJPlayers[0].Hands = []Hand{tc.inputHand}
+
+			actualErr := testBlackjack.autoDrawCards(testBJPlayers)
+
+			if tc.expectedError != nil {
+				require.EqualError(t, actualErr, tc.expectedError.Error())
+				return
+			}
+
+			actualHand := testBJPlayers[0].Hands[0]
+
+			require.NoError(t, actualErr)
+			require.Equal(t, tc.shouldHaveBlackjack, actualHand.Blackjack())
+
+			if tc.shouldDraw {
+				require.Len(t, actualHand.cards, 2)
+			} else {
+				require.Len(t, actualHand.cards, 1)
+			}
+		})
+	}
+}
+
 func TestBlackjack_handlePotentialSplits(t *testing.T) {
 	type testCase struct {
 		name            string
