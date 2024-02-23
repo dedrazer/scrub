@@ -1,5 +1,8 @@
 # scrub
 
+## description
+This is a Monte Carlo blackjack simulation to test out different betting strategies with configurable cashout amounts.
+
 ## todo
 - test refactored methods (before: 73.1% files, 53% statements)
 - desired functionality:
